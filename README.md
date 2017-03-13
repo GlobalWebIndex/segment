@@ -22,7 +22,7 @@ var segment = Segment.getClient(YOUR_SEGMENT_WRITE_KEY, additionalContext, btoa)
 
 ### #identify
 
-```
+```javascript
 const userId = 'someId';
 
 const traits = {
@@ -34,7 +34,7 @@ segment.identify(userId, traits);
 
 ### #track
 
-```
+```javascript
 const userId = 'someId';
 const event = 'Clicked a CTA'
 
@@ -47,7 +47,7 @@ segment.track(userId, event, properties);
 
 ### #anonymousTrack
 
-```
+```javascript
 const anonymousId = '123abc';
 const event = 'Clicked a CTA'
 
@@ -60,7 +60,7 @@ segment.anonymousTrack(anonymousId, event, properties);
 
 ### #page
 
-```
+```javascript
 const userId = 'someId';
 const name = 'Index Page'
 
@@ -73,7 +73,7 @@ segment.page(userId, name, properties);
 
 ### #anonymousPage
 
-```
+```javascript
 const anonymousId = '123abc';
 const name = 'Index Page'
 
