@@ -92,3 +92,6 @@ const properties = {
 segment.anonymousPage(anonymousId, name, properties);
 ```
 
+## Licence
+
+[ISC](https://en.wikipedia.org/wiki/ISC_license)
