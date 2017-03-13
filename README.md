@@ -7,7 +7,7 @@ A Segment analytics library using the HTTP api directly. The reason for this lib
 ### Client initialization
 
 ```javascript
-const Segment = require('segment');
+const Segment = require('gwi-segment');
 
 // Optional
 const additionContext = {
