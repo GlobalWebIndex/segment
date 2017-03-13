@@ -14,7 +14,9 @@ const additionContext = {
   app: 'My Supreme Application'
 };
 
-// Optional, window.btoa is the default if you do not provide this argument
+// Optional
+// window.btoa is the default if you do not provide this argument
+//   and it is used to generate the right authentication header from your key
 const btoa = window.btoa
 
 var segment = Segment.getClient(YOUR_SEGMENT_WRITE_KEY, additionalContext, btoa);
