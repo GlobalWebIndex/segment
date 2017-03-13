@@ -4,6 +4,12 @@ A Segment analytics library using the HTTP api directly. The reason for this lib
 
 ## Usage
 
+### Installation
+
+```
+$ npm install gwi-segment --save
+```
+
 ### Client initialization
 
 ```javascript
