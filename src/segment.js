@@ -28,7 +28,7 @@ module.exports = {
       return fetch(
         baseUrl + type,
         {
-          method,
+          method: method,
           headers: headers,
           body: JSON.stringify(body)
         }
