@@ -23,10 +23,11 @@
   "devDependencies": {
     "btoa": "^1.1.2",
     "fetch-mock": "^5.9.4",
-    "jasmine": "^2.5.3"
+    "jasmine": "^2.5.3",
+    "sinon": "^2.1.0"
   },
   "dependencies": {
     "es6-promise": "^4.1.0",
-    "isomorphic-fetch": "^2.2.1"
+    "whatwg-fetch": "^2.0.3"
   }
 }
