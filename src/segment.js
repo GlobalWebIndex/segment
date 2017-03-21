@@ -6,7 +6,7 @@ var library = {
   version: '1.0.1'
 }
 
-module.exports = {
+var publicInterface = {
   getClient: function(key, context, btoa){
     btoa = btoa || window.btoa;
 
@@ -81,3 +81,4 @@ module.exports = {
   }
 };
 
+module.exports = publicInterface;
