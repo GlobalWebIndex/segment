@@ -27,7 +27,7 @@ describe('AnonymousTracker', function(){
       tracker.anonymousTrack(event, properties);
     });
 
-    it('should call client.track', function(){
+    it('should call client.anonymousTrack', function(){
       sinon.assert.calledWith(client.anonymousTrack, sinon.match(anonymousId, event, properties));
     });
   });
@@ -42,7 +42,7 @@ describe('AnonymousTracker', function(){
       tracker.anonymousPage(name, properties);
     });
 
-    it('should call client.page', function(){
+    it('should call client.anonymousPage', function(){
       sinon.assert.calledWith(client.anonymousPage, sinon.match(anonymousId, name, properties));
     });
   });

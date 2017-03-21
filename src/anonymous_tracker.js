@@ -1,21 +1,26 @@
 var getArgs = require('./utils').getArgs;
 
-var publicMethods = {
+var staticMethods = {
   init: function(client, anonymousId) {
     var userId = userId;
 
-    return {
-      anonymousTrack: function() {
-        var args = getArgs(anonymousId, arguments);
-        return client.anonymousTrack.apply(this, args);
-      },
-      anonymousPage: function() {
-        var args = getArgs(anonymousId, arguments);
-        return client.anonymousPage.apply(this, args);
-      }
+    var delegatedMethods = ['anonymousTrack', 'anonymousPage'];
+    var publicMethods = {};
+
+    for(var i = 0; i < delegatedMethods.length; i++) {
+      var method = delegatedMethods[i];
+
+      publicMethods[method] = function(m) {
+        return function() {
+          var args = getArgs(anonymousId, arguments);
+          return client[m].apply(this, args);
+        };
+      }(method)
     }
+
+    return publicMethods;
   }
 }
 
-module.exports = publicMethods;
+module.exports = staticMethods;
 
