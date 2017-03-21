@@ -42,23 +42,18 @@ describe('Segment', function(){
     });
 
     describe('user events', function(){
-      var userId;
+      var userId, traits;
 
       beforeEach(function(){
         userId = 'jon.snow';
+        traits = {
+          swordsman: true
+        };
+
+        segment.identify(userId, traits);
       });
 
       describe('#identify', function(){
-        var traits;
-
-        beforeEach(function(){
-          traits = {
-            swordsman: true
-          };
-
-          segment.identify(userId, traits);
-        });
-
         it('should call identify', function(){
           var calls = fetchMock._calls[identifyUrl]
 
@@ -94,7 +89,7 @@ describe('Segment', function(){
             location: 'here'
           };
 
-          segment.track(userId, event, properties);
+          segment.track(event, properties);
         });
 
         it('should call track', function(){
@@ -132,7 +127,8 @@ describe('Segment', function(){
             search: 'for something'
           }
 
-          segment.page(userId, name, properties);
+          segment.identify(userId);
+          segment.page(name, properties);
         });
 
         it('should call page', function(){
@@ -321,7 +317,8 @@ describe('Segment', function(){
             location: 'here'
           };
 
-          segment.track(userId, event, properties);
+          segment.identify(userId);
+          segment.track(event, properties);
         });
 
         it('should call track', function(){
@@ -360,7 +357,8 @@ describe('Segment', function(){
             search: 'for something'
           }
 
-          segment.page(userId, name, properties);
+          segment.identify(userId);
+          segment.page(name, properties);
         });
 
         it('should call page', function(){

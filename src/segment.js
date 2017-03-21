@@ -6,79 +6,82 @@ var library = {
   version: '1.0.1'
 }
 
-var publicInterface = {
-  getClient: function(key, context, btoa){
-    btoa = btoa || window.btoa;
+function Segment(key, context, btoa){
+  var userId = 'anonymous';
+  btoa = btoa || window.btoa;
 
-    context = context || {};
-    context.library = context.library || {};
-    context.library.name = library.name;
-    context.library.version = library.version;
+  context = context || {};
+  context.library = context.library || {};
+  context.library.name = library.name;
+  context.library.version = library.version;
 
-    var baseUrl = 'https://api.segment.io/v1/';
-    var method = 'POST';
-    var headers = {
-      'Authorization': 'Basic ' + btoa(key + ':'),
-      'Content-Type': 'application/json'
-    };
+  var baseUrl = 'https://api.segment.io/v1/';
+  var method = 'POST';
+  var headers = {
+    'Authorization': 'Basic ' + btoa(key + ':'),
+    'Content-Type': 'application/json'
+  };
 
-    function apiCall(type, body) {
-      body['context'] = context;
+  function apiCall(type, body) {
+    body['context'] = context;
 
-      return fetch(
-        baseUrl + type,
-        {
-          method: method,
-          headers: headers,
-          body: JSON.stringify(body)
-        }
-      );
-    };
+    return fetch(
+      baseUrl + type,
+      {
+        method: method,
+        headers: headers,
+        body: JSON.stringify(body)
+      }
+    );
+  };
 
-    return {
-      identify: function(userId, traits){
-        return apiCall('identify', {
-          userId: userId,
-          traits: traits
-        });
-      },
+  return {
+    identify: function(id, traits){
+      userId = id;
 
-      track: function(userId, event, properties){
-        return apiCall('track', {
-          userId: userId,
-          event: event,
-          properties: properties
-        });
-      },
+      return apiCall('identify', {
+        userId: id,
+        traits: traits
+      });
+    },
 
-      anonymousTrack: function(anonymousId, event, properties){
-        return apiCall('track', {
-          anonymousId: anonymousId,
-          event: event,
-          properties: properties
-        });
-      },
+    track: function(event, properties){
+      return apiCall('track', {
+        userId: userId,
+        event: event,
+        properties: properties
+      });
+    },
 
-      page: function(userId, name, properties) {
-        return apiCall('page', {
-          userId: userId,
-          name: name,
-          properties: properties
-        });
-      },
+    anonymousTrack: function(anonymousId, event, properties){
+      return apiCall('track', {
+        anonymousId: anonymousId,
+        event: event,
+        properties: properties
+      });
+    },
 
-      anonymousPage: function(anonymousId, name, properties) {
-        return apiCall('page', {
-          anonymousId: anonymousId,
-          name: name,
-          properties: properties
-        });
-      },
+    page: function(name, properties) {
+      return apiCall('page', {
+        userId: userId,
+        name: name,
+        properties: properties
+      });
+    },
 
-      version: library.version,
-      name: library.name
-    }
+    anonymousPage: function(anonymousId, name, properties) {
+      return apiCall('page', {
+        anonymousId: anonymousId,
+        name: name,
+        properties: properties
+      });
+    },
+
+    version: library.version,
+    name: library.name
   }
-};
+}
 
-module.exports = publicInterface;
+module.exports = {
+  getClient: Segment
+};
