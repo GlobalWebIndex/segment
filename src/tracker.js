@@ -45,6 +45,20 @@ var staticMethods = {
       return isIdentified;
     };
 
+    publicMethods['identifiedTrack'] = function(event, properties, traits){
+      return publicMethods.identifyOnce(traits)
+        .then(function(){
+          publicMethods.track(event, properties);
+        });
+    }
+
+    publicMethods['identifiedPage'] = function(name, properties, traits){
+      return publicMethods.identifyOnce(traits)
+        .then(function(){
+          publicMethods.page(name, properties);
+        });
+    }
+
     return publicMethods;
   }
 }

@@ -83,6 +83,34 @@ describe('Tracker', function(){
     });
   });
 
+  describe('#identifiedTrack', function(){
+    var event, properties, traits;
+
+    beforeEach(function(done){
+      event = "Left Winterfell";
+      properties = { foo: 'foo', bar: 'bar' };
+      traits = { god: 'true' };
+
+      tracker.identifiedTrack(event, properties, traits)
+        .then(function(){
+          tracker.identifiedTrack(event, properties, traits);
+        })
+        .then(function(){
+          done();
+        });
+    });
+
+    it('calls client.identify once', function(){
+      sinon.assert.calledOnce(client.identify);
+      sinon.assert.calledWith(client.identify, sinon.match(userId, traits));
+    });
+
+    it('calls client.track twice', function(){
+      sinon.assert.calledTwice(client.track);
+      sinon.assert.calledWith(client.track, sinon.match(userId, event, properties));
+    });
+  });
+
   describe('#page', function(){
     var name, properties;
 
@@ -94,6 +122,34 @@ describe('Tracker', function(){
     });
 
     it('calls client.page', function(){
+      sinon.assert.calledWith(client.page, sinon.match(userId, name, properties));
+    });
+  });
+
+  describe('#identifiedPage', function(){
+    var name, properties, traits;
+
+    beforeEach(function(done){
+      name = "Something";
+      properties = { foo: 'foo', bar: 'bar' };
+      traits = { god: 'true' };
+
+      tracker.identifiedPage(name, properties, traits)
+        .then(function(){
+          tracker.identifiedPage(name, properties, traits);
+        })
+        .then(function(){
+          done();
+        });
+    });
+
+    it('calls client.identify once', function(){
+      sinon.assert.calledOnce(client.identify);
+      sinon.assert.calledWith(client.identify, sinon.match(userId, traits));
+    });
+
+    it('calls client.page twice', function(){
+      sinon.assert.calledTwice(client.page);
       sinon.assert.calledWith(client.page, sinon.match(userId, name, properties));
     });
   });
