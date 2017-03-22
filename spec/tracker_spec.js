@@ -1,5 +1,6 @@
 var Tracker = require('../src/tracker');
-var sinon = require('sinon')
+var sinon = require('sinon');
+var Promise = require('es6-promise').Promise;
 
 describe('Tracker', function(){
   var userId, tracker, client, sandbox;
@@ -7,8 +8,12 @@ describe('Tracker', function(){
   beforeEach(function(){
     sandbox = sinon.sandbox.create();
 
+    var p = new Promise(function(resolve){
+      resolve();
+    });
+
     client = {
-      identify: sandbox.stub(),
+      identify: sandbox.stub().returns(p),
       track: sandbox.stub(),
       page: sandbox.stub()
     }
@@ -21,13 +26,45 @@ describe('Tracker', function(){
   describe('#identify', function(){
     var traits;
 
-    beforeEach(function(){
+    beforeEach(function(done){
       traits = { foo: 'foo', bar: 'bar' };
-      tracker.identify(traits);
+
+      tracker.identify(traits).then(function(){
+        done();
+      });
     });
 
-    it('should call client.identify', function(){
+    it('calls client.identify', function(){
       sinon.assert.calledWith(client.identify, sinon.match(userId, traits));
+    });
+
+    it('sets the isIdentified flag', function(){
+      expect(tracker.getIsIdentified()).toEqual(true);
+    });
+  });
+
+  describe('#identifyOnce', function(){
+    var traits;
+
+    beforeEach(function(done){
+      traits = { foo: 'foo', bar: 'bar' };
+
+      tracker.identifyOnce(traits)
+        .then(function(){
+          tracker.identifyOnce(traits);
+        })
+        .then(function(){
+          done();
+        });
+    });
+
+    it('calls client.identify only once', function(){
+      sinon.assert.calledOnce(client.identify);
+      sinon.assert.calledWith(client.identify, sinon.match(userId, traits));
+    });
+
+    it('sets the isIdentified flag', function(){
+      expect(tracker.getIsIdentified()).toEqual(true);
     });
   });
 
@@ -41,7 +78,7 @@ describe('Tracker', function(){
       tracker.track(event, properties);
     });
 
-    it('should call client.track', function(){
+    it('calls client.track', function(){
       sinon.assert.calledWith(client.track, sinon.match(userId, event, properties));
     });
   });
@@ -56,7 +93,7 @@ describe('Tracker', function(){
       tracker.page(name, properties);
     });
 
-    it('should call client.page', function(){
+    it('calls client.page', function(){
       sinon.assert.calledWith(client.page, sinon.match(userId, name, properties));
     });
   });
