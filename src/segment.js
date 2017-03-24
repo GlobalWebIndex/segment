@@ -41,15 +41,15 @@ module.exports = {
           body: JSON.stringify(body)
         }
       );
-    };
+    }
 
     function lazyApiCall(type, body) {
       return new Promise(function(resolve) {
         queue.enqueue(function() {
           apiCall(type, body).then(function(result) {
             resolve(result);
-          })
-        })
+          });
+        });
       });
     }
 
