@@ -43,9 +43,13 @@ function Segment(key, context, btoa){
   };
 
   function lazyApiCall(type, body) {
-    return function() {
-      return apiCall(type, body);
-    }
+    return new Promise(function(resolve) {
+      queue.enqueue(function() {
+        apiCall(type, body).then(function(result) {
+          resolve(result);
+        })
+      })
+    });
   }
 
   // user tracks
@@ -71,11 +75,11 @@ function Segment(key, context, btoa){
     },
 
     track: function(event, properties){
-      return queue.enqueue(lazyApiCall('track', {
+      return lazyApiCall('track', {
         userId: userId,
         event: event,
         properties: properties
-      }))
+      });
     },
 
     anonymousTrack: function(anonymousId, event, properties){
@@ -87,11 +91,11 @@ function Segment(key, context, btoa){
     },
 
     page: function(name, properties) {
-      return queue.enqueue(lazyApiCall('page', {
+      return lazyApiCall('page', {
         userId: userId,
         name: name,
         properties: properties
-      }));
+      });
     },
 
     anonymousPage: function(anonymousId, name, properties) {

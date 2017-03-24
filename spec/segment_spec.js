@@ -80,7 +80,7 @@ describe('Segment', function(){
       });
 
       describe('#track', function(){
-        var event, properties;
+        var event, properties, returned;
 
         beforeEach(function(){
           event = 'Something happened';
@@ -89,13 +89,14 @@ describe('Segment', function(){
             location: 'here'
           };
 
-          segment.track(event, properties);
+          returned = segment.track(event, properties);
         });
 
         it('should call track', function(){
           var calls = fetchMock._calls[trackUrl]
 
           expect(calls.length).toEqual(1);
+          expect(typeof returned.then, 'function', 'should return promise');
 
           matchSegmentCall(calls[0][1], {
             method: 'POST',
