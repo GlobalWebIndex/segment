@@ -6,9 +6,9 @@ function matchSegmentCall(actualData, expectedData) {
   expect(Object.keys(actualData)).toEqual(['method', 'headers', 'body']);
 
   var
-    method = actualData.method,
-    headers = actualData.headers,
-    body = JSON.parse(actualData.body);
+  method = actualData.method,
+  headers = actualData.headers,
+  body = JSON.parse(actualData.body);
 
   expect(method).toEqual(expectedData.method);
   expect(headers).toEqual(expectedData.headers);
@@ -42,18 +42,19 @@ describe('Segment', function(){
     });
 
     describe('user events', function(){
-      var userId, traits;
-
-      beforeEach(function(){
-        userId = 'jon.snow';
-        traits = {
-          swordsman: true
-        };
-
-        segment.identify(userId, traits);
-      });
 
       describe('#identify', function(){
+        var traits;
+
+        beforeEach(function(){
+          userId = 'jon.snow';
+          traits = {
+            swordsman: true
+          };
+
+          segment.identify(userId, traits);
+        });
+
         it('should call identify', function(){
           var calls = fetchMock._calls[identifyUrl]
 
@@ -80,7 +81,7 @@ describe('Segment', function(){
       });
 
       describe('#track', function(){
-        var event, properties, returned;
+        var event, properties;
 
         beforeEach(function(){
           event = 'Something happened';
@@ -89,14 +90,14 @@ describe('Segment', function(){
             location: 'here'
           };
 
-          returned = segment.track(event, properties);
+          segment.identify(userId);
+          segment.track(event, properties);
         });
 
         it('should call track', function(){
           var calls = fetchMock._calls[trackUrl]
 
           expect(calls.length).toEqual(1);
-          expect(typeof returned.then, 'function', 'should return promise');
 
           matchSegmentCall(calls[0][1], {
             method: 'POST',
@@ -475,6 +476,65 @@ describe('Segment', function(){
           });
         });
       });
+    });
+  });
+
+  describe('Promise API', function() {
+    var properties;
+
+    beforeEach(function(){
+      segment = Segment.getClient(key, null, btoa);
+
+      properties = {
+        location: 'here'
+      };
+    });
+
+    it('should resolve promises in right order', function(done) {
+      var resolved = [];
+
+      segment.track('first', properties).then(() => {
+        resolved.push(0);
+      });
+
+      segment.track('second', properties).then(() => {
+        resolved.push(1);
+      });
+
+      segment.track('third', properties).then(() => {
+        resolved.push(2);
+
+        expect(resolved).toEqual([0,1,2], 'Tracked in right order');
+        done();
+      });
+
+      // identify called after tracks
+      segment.identify(userId);
+
+      // track all data
+      var calls = fetchMock._calls[trackUrl]
+
+      expect(calls.length).toEqual(3);
+
+      matchSegmentCall(calls[0][1], {
+        method: 'POST',
+        headers: {
+          Authorization: 'Basic ' + btoa(key + ':'),
+          'Content-Type': 'application/json'
+        },
+        body: {
+          userId: userId,
+          event: 'first',
+          properties: properties,
+          context: {
+            library: {
+              name: segment.name,
+              version: segment.version
+            }
+          }
+        }
+      });
+
     });
   });
 });

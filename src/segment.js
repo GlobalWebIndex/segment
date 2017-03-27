@@ -5,7 +5,7 @@ var Queue = require('./utils/queue');
 // library meta
 var library = {
   name: 'gwi',
-  version: '1.0.1'
+  version: '2.0.0-alpha1'
 }
 
 // constructor
@@ -46,6 +46,8 @@ module.exports = {
     function lazyApiCall(type, body) {
       return new Promise(function(resolve) {
         queue.enqueue(function() {
+          body.userId = userId; // set userId
+
           apiCall(type, body).then(function(result) {
             resolve(result);
           });
@@ -55,7 +57,7 @@ module.exports = {
 
     // user tracks
     queue.subscribe(function(queue) {
-      if (userId === 'annonymous') return;
+      if (userId === 'anonymous') return;
 
       while(queue) {
         var lastEvent = queue.dequeue();
@@ -69,15 +71,13 @@ module.exports = {
       identify: function(id, traits){
         userId = id;
 
-        return apiCall('identify', {
-          userId: id,
+        return lazyApiCall('identify', {
           traits: traits
         });
       },
 
       track: function(event, properties){
         return lazyApiCall('track', {
-          userId: userId,
           event: event,
           properties: properties
         });
@@ -93,7 +93,6 @@ module.exports = {
 
       page: function(name, properties) {
         return lazyApiCall('page', {
-          userId: userId,
           name: name,
           properties: properties
         });
