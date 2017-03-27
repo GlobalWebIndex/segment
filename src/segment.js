@@ -133,6 +133,7 @@ module.exports = {
   getClient: function(key, context, btoa) {
     return Constructor(constructAdapter(false, key, btoa), context);
   },
+
   getTestMockClient: function(key, context, btoa) {
     mockQueue = Queue();
 
