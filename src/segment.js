@@ -138,6 +138,9 @@ module.exports = {
 
     var publicApi = Constructor(constructAdapter(mockQueue, key, btoa), context);
 
+    // set simple flag
+    publicApi.mock = true;
+
     // mock inspect API
     publicApi.inspect = {
       allTracks: function() {
