@@ -147,16 +147,16 @@ module.exports = {
 
     // mock inspect API
     publicApi.inspect = {
-      allTracks: function() {
+      allEvents: function() {
         return mockQueue.toArray();
       },
 
-      lastTrack: function() {
+      lastEvent: function() {
         var array = mockQueue();
         return array[array.length - 1];
       },
 
-      clear: function() {
+      clearEvents: function() {
         while(mockQueue) {
           var lastEvent = queue.dequeue();
           lastEvent.value();
