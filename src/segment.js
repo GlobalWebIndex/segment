@@ -136,6 +136,10 @@ module.exports = {
   getTestMockClient: function(key, context, btoa) {
     mockQueue = Queue();
 
+    mockQueue.onEnqueue(function(queue, event) {
+      console.info('Segment.io event tracked', event);
+    });
+
     var publicApi = Constructor(constructAdapter(mockQueue, key, btoa), context);
 
     // set simple flag
@@ -150,6 +154,14 @@ module.exports = {
       lastTrack: function() {
         var array = mockQueue();
         return array[array.length - 1];
+      },
+
+      clear: function() {
+        while(mockQueue) {
+          var lastEvent = queue.dequeue();
+          lastEvent.value();
+          mockQueue = lastEvent.next;
+        }
       }
     }
   }
