@@ -31,7 +31,7 @@ module.exports = {
 
     // api request
     function apiCall(type, body) {
-      body['context'] = context;
+      body.context = context;
 
       return fetch(
         baseUrl + type,
@@ -44,13 +44,13 @@ module.exports = {
     }
 
     function lazyApiCall(type, body) {
-      return new Promise(function(resolve) {
+      return new Promise(function(resolve, reject) {
         queue.enqueue(function() {
           body.userId = userId; // set userId
 
-          apiCall(type, body).then(function(result) {
-            resolve(result);
-          });
+          apiCall(type, body)
+            .then(resolve)
+            .catch(reject);
         });
       });
     }

@@ -6,9 +6,9 @@ function matchSegmentCall(actualData, expectedData) {
   expect(Object.keys(actualData)).toEqual(['method', 'headers', 'body']);
 
   var
-  method = actualData.method,
-  headers = actualData.headers,
-  body = JSON.parse(actualData.body);
+    method = actualData.method,
+    headers = actualData.headers,
+    body = JSON.parse(actualData.body);
 
   expect(method).toEqual(expectedData.method);
   expect(headers).toEqual(expectedData.headers);
