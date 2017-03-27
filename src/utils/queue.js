@@ -14,7 +14,7 @@ function Queue() {
 
       // call subscribers
       if (callback) {
-        callback(publicMethods, item)
+        callback(publicMethods, item);
       }
 
       return publicMethods;
