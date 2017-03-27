@@ -164,5 +164,7 @@ module.exports = {
         }
       }
     }
+
+    return publicApi;
   }
 };
