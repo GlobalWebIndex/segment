@@ -5,7 +5,7 @@ var Queue = require('./utils/queue');
 // library meta
 var library = {
   name: 'gwi',
-  version: '2.0.0-alpha1'
+  version: '2.0.0-alpha2'
 }
 
 function constructAdapter(mockQueue, key, btoa) {
