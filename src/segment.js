@@ -56,7 +56,7 @@ module.exports = {
     }
 
     // user tracks
-    queue.subscribe(function(queue) {
+    queue.onEnqueue(function(queue) {
       if (userId === 'anonymous') return;
 
       while(queue) {

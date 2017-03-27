@@ -29,13 +29,13 @@ describe('Queue', function() {
     });
   });
 
-  describe('#subscribe', function() {
+  describe('#onEnqueue', function() {
     var queue = Queue();
     var result;
 
     describe('simple case', function() {
       beforeEach(function(done) {
-        queue.subscribe(function(res) {
+        queue.onEnqueue(function(res) {
           result = res;
           done();
         });
@@ -54,7 +54,7 @@ describe('Queue', function() {
       beforeEach(function(done) {
         queue.enqueue(0);
 
-        queue.subscribe(function(res) {
+        queue.onEnqueue(function(res) {
           result = res;
           done();
         });
@@ -74,26 +74,27 @@ describe('Queue', function() {
         expect(queue.size()).toEqual(0);
       });
     });
-  });
 
-  describe('#unSubscribe', function() {
-    var queue = Queue();
+    describe('unsubscribe', function() {
+      var queue = Queue();
 
-    it('should not call calback after unsubscription', function(done) {
-      var result;
+      it('should not call calback after unsubscription', function(done) {
+        var result;
 
-      function callback(res) {
-        result = res;
-      }
+        function callback(res) {
+          result = res;
+        }
 
-      queue.subscribe(callback);
-      queue.unSubscribe(callback);
-      queue.enqueue(1);
+        queue.onEnqueue(callback);
+        queue.onEnqueue();
+        queue.enqueue(1);
 
-      setTimeout(function() {
-        expect(result).toEqual(undefined);
-        done();
-      }, 10);
+        setTimeout(function() {
+          expect(result).toEqual(undefined);
+          expect(typeof callback).toEqual('function', 'is still function');
+          done();
+        }, 10);
+      });
     });
   });
 });
