@@ -1,3 +1,4 @@
+
 var Queue = require('../../src/utils/queue');
 
 describe('Queue', function() {

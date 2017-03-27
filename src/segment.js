@@ -68,7 +68,7 @@ module.exports = {
 
     // public interface
     return {
-      identify: function(id, traits){
+      identify: function(id, traits) {
         userId = id;
 
         return lazyApiCall('identify', {
@@ -76,14 +76,14 @@ module.exports = {
         });
       },
 
-      track: function(event, properties){
+      track: function(event, properties) {
         return lazyApiCall('track', {
           event: event,
           properties: properties
         });
       },
 
-      anonymousTrack: function(anonymousId, event, properties){
+      anonymousTrack: function(anonymousId, event, properties) {
         return apiCall('track', {
           anonymousId: anonymousId,
           event: event,

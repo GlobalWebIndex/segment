@@ -1,4 +1,5 @@
 function Queue() {
+  // initial state
   var state = [];
   var callback;
 

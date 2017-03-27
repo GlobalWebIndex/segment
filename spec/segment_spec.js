@@ -15,11 +15,11 @@ function matchSegmentCall(actualData, expectedData) {
   expect(body).toEqual(expectedData.body);
 }
 
-describe('Segment', function(){
+describe('Segment', function() {
   var segment, key;
   var identifyUrl, trackUrl, pageUrl;
 
-  beforeEach(function(){
+  beforeEach(function() {
     key = '123';
 
     identifyUrl = 'https://api.segment.io/v1/identify';
@@ -32,21 +32,21 @@ describe('Segment', function(){
       .mock(pageUrl, 200)
   });
 
-  afterEach(function(){
+  afterEach(function() {
     fetchMock.reset();
   });
 
   describe('without custom context', function(){
-    beforeEach(function(){
+    beforeEach(function() {
       segment = Segment.getClient(key, null, btoa);
     });
 
-    describe('user events', function(){
+    describe('user events', function() {
 
-      describe('#identify', function(){
+      describe('#identify', function() {
         var traits;
 
-        beforeEach(function(){
+        beforeEach(function() {
           userId = 'jon.snow';
           traits = {
             swordsman: true
@@ -55,7 +55,7 @@ describe('Segment', function(){
           segment.identify(userId, traits);
         });
 
-        it('should call identify', function(){
+        it('should call identify', function() {
           var calls = fetchMock._calls[identifyUrl]
 
           expect(calls.length).toEqual(1);
@@ -80,7 +80,7 @@ describe('Segment', function(){
         });
       });
 
-      describe('#track', function(){
+      describe('#track', function() {
         var event, properties;
 
         beforeEach(function(){
@@ -94,7 +94,7 @@ describe('Segment', function(){
           segment.track(event, properties);
         });
 
-        it('should call track', function(){
+        it('should call track', function() {
           var calls = fetchMock._calls[trackUrl]
 
           expect(calls.length).toEqual(1);
@@ -120,7 +120,7 @@ describe('Segment', function(){
         });
       });
 
-      describe('#page', function(){
+      describe('#page', function() {
         var name, properties;
 
         beforeEach(function(){
@@ -133,7 +133,7 @@ describe('Segment', function(){
           segment.page(name, properties);
         });
 
-        it('should call page', function(){
+        it('should call page', function() {
           var calls = fetchMock._calls[pageUrl]
 
           expect(calls.length).toEqual(1);
@@ -160,17 +160,17 @@ describe('Segment', function(){
       });
     });
 
-    describe('anonymous events', function(){
+    describe('anonymous events', function() {
       var anonymousId;
 
       beforeEach(function(){
         anonymousId = 'abcdxyz';
       });
 
-      describe('#anonymousTrack', function(){
+      describe('#anonymousTrack', function() {
         var event, properties;
 
-        beforeEach(function(){
+        beforeEach(function() {
           event = 'Something happened';
 
           properties = {
@@ -180,7 +180,7 @@ describe('Segment', function(){
           segment.anonymousTrack(anonymousId, event, properties);
         });
 
-        it('should call track', function(){
+        it('should call track', function() {
           var calls = fetchMock._calls[trackUrl]
 
           expect(calls.length).toEqual(1);
@@ -206,10 +206,10 @@ describe('Segment', function(){
         });
       });
 
-      describe('#anonymousPage', function(){
+      describe('#anonymousPage', function() {
         var name, properties;
 
-        beforeEach(function(){
+        beforeEach(function() {
           name = 'Index page';
           properties = {
             search: 'for something'
@@ -218,7 +218,7 @@ describe('Segment', function(){
           segment.anonymousPage(anonymousId, name, properties);
         });
 
-        it('should call page', function(){
+        it('should call page', function() {
           var calls = fetchMock._calls[pageUrl]
 
           expect(calls.length).toEqual(1);
@@ -246,7 +246,7 @@ describe('Segment', function(){
     });
   });
 
-  describe('with custom context', function(){
+  describe('with custom context', function() {
     var app, libraryName, libraryVersion, context;
 
     beforeEach(function(){
@@ -265,17 +265,17 @@ describe('Segment', function(){
       segment = Segment.getClient(key, context, btoa);
     });
 
-    describe('user events', function(){
+    describe('user events', function() {
       var userId;
 
-      beforeEach(function(){
+      beforeEach(function() {
         userId = 'jon.snow';
       });
 
-      describe('#identify', function(){
+      describe('#identify', function() {
         var traits;
 
-        beforeEach(function(){
+        beforeEach(function() {
           traits = {
             swordsman: true
           };
@@ -283,7 +283,7 @@ describe('Segment', function(){
           segment.identify(userId, traits);
         });
 
-        it('should call identify', function(){
+        it('should call identify', function() {
           var calls = fetchMock._calls[identifyUrl]
 
           expect(calls.length).toEqual(1);
@@ -309,10 +309,10 @@ describe('Segment', function(){
         });
       });
 
-      describe('#track', function(){
+      describe('#track', function() {
         var event, properties;
 
-        beforeEach(function(){
+        beforeEach(function() {
           event = 'Something happened';
 
           properties = {
@@ -323,7 +323,7 @@ describe('Segment', function(){
           segment.track(event, properties);
         });
 
-        it('should call track', function(){
+        it('should call track', function() {
           var calls = fetchMock._calls[trackUrl]
 
           expect(calls.length).toEqual(1);
@@ -350,10 +350,10 @@ describe('Segment', function(){
         });
       });
 
-      describe('#page', function(){
+      describe('#page', function() {
         var name, properties;
 
-        beforeEach(function(){
+        beforeEach(function() {
           name = 'Index page';
           properties = {
             search: 'for something'
@@ -363,7 +363,7 @@ describe('Segment', function(){
           segment.page(name, properties);
         });
 
-        it('should call page', function(){
+        it('should call page', function() {
           var calls = fetchMock._calls[pageUrl]
 
           expect(calls.length).toEqual(1);
@@ -391,17 +391,17 @@ describe('Segment', function(){
       });
     });
 
-    describe('anonymous events', function(){
+    describe('anonymous events', function() {
       var anonymousId;
 
-      beforeEach(function(){
+      beforeEach(function() {
         anonymousId = 'abcdxyz';
       });
 
-      describe('#anonymousTrack', function(){
+      describe('#anonymousTrack', function() {
         var event, properties;
 
-        beforeEach(function(){
+        beforeEach(function() {
           event = 'Something happened';
 
           properties = {
@@ -411,7 +411,7 @@ describe('Segment', function(){
           segment.anonymousTrack(anonymousId, event, properties);
         });
 
-        it('should call track', function(){
+        it('should call track', function() {
           var calls = fetchMock._calls[trackUrl]
 
           expect(calls.length).toEqual(1);
@@ -438,10 +438,10 @@ describe('Segment', function(){
         });
       });
 
-      describe('#anonymousPage', function(){
+      describe('#anonymousPage', function() {
         var name, properties;
 
-        beforeEach(function(){
+        beforeEach(function() {
           name = 'Index page';
           properties = {
             search: 'for something'
@@ -450,7 +450,7 @@ describe('Segment', function(){
           segment.anonymousPage(anonymousId, name, properties);
         });
 
-        it('should call page', function(){
+        it('should call page', function() {
           var calls = fetchMock._calls[pageUrl]
 
           expect(calls.length).toEqual(1);
@@ -482,7 +482,7 @@ describe('Segment', function(){
   describe('Promise API', function() {
     var properties;
 
-    beforeEach(function(){
+    beforeEach(function() {
       segment = Segment.getClient(key, null, btoa);
 
       properties = {
@@ -534,7 +534,6 @@ describe('Segment', function(){
           }
         }
       });
-
     });
   });
 });
