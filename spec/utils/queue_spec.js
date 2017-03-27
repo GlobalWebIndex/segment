@@ -1,8 +1,13 @@
 var Queue = require('../../src/utils/queue');
 
 describe('Queue', function() {
+  var queue;
+
+  beforeEach(function() {
+    queue = Queue();
+  });
+
   describe('#enque / #dequeue', function() {
-    var queue = Queue();
 
     it('Should enqueue 1', function() {
       queue.enqueue(1);
@@ -10,27 +15,28 @@ describe('Queue', function() {
     });
 
     it('Should keep a state', function() {
+      queue.enqueue(1);
       queue.enqueue(2);
       expect(queue.size()).toEqual(2);
     });
 
-    it('should deque with resukt', function() {
-      var result = queue.dequeue();
+    it('should deque with result', function() {
+      queue.enqueue(1);
+      queue.enqueue(2);
+
+      const result = queue.dequeue();
       expect(result.value).toEqual(1);
       expect(result.next).toEqual(queue);
       expect(queue.size()).toEqual(1);
-    });
 
-    it('should deque to empty', function() {
-      var result = queue.dequeue();
-      expect(result.value).toEqual(2);
-      expect(result.next).toEqual(null);
+      const result2 = queue.dequeue();
+      expect(result2.value).toEqual(2);
+      expect(result2.next).toEqual(null);
       expect(queue.size()).toEqual(0);
     });
   });
 
   describe('#onEnqueue', function() {
-    var queue = Queue();
     var result;
 
     describe('simple case', function() {
