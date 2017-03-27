@@ -153,7 +153,7 @@ module.exports = {
       },
 
       lastEvent: function() {
-        var array = mockQueue();
+        var array = mockQueue.toArray();
         return array[array.length - 1];
       },
 
