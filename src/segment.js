@@ -159,7 +159,7 @@ module.exports = {
 
       clearEvents: function() {
         while(mockQueue) {
-          var lastEvent = queue.dequeue();
+          var lastEvent = mockQueue.dequeue();
           lastEvent.value();
           mockQueue = lastEvent.next;
         }
