@@ -28,7 +28,7 @@ function constructAdapter(mockQueue, key, btoa) {
             body: body
           });
 
-          resolve({ status: 200 });
+          resolve({ status: 200, body: { success: true } });
         }, 0);
       });
     }
@@ -154,7 +154,7 @@ module.exports = {
 
       lastEvent: function() {
         var array = mockQueue.toArray();
-        return array[array.length - 1];
+        return array[0];
       },
 
       clearEvents: function() {

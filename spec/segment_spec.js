@@ -537,3 +537,11 @@ describe('Segment', function() {
     });
   });
 });
+
+describe('test mock', function() {
+  var segment;
+
+  beforeEach(function() {
+    segment = Segment.gettestMockClient(key, null, btoa);
+  });
+});
