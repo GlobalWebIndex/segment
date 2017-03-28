@@ -137,14 +137,11 @@ module.exports = {
   getTestMockClient: function(key, context, btoa) {
     mockQueue = Queue();
 
-    mockQueue.onEnqueue(function(queue, event) {
-      console.info('Segment.io event tracked', event);
-    });
-
     var publicApi = Constructor(constructAdapter(mockQueue, key, btoa), context);
 
     // set simple flag
     publicApi.mock = true;
+    publicApi.logger = false;
 
     // mock inspect API
     publicApi.inspect = {
@@ -160,11 +157,21 @@ module.exports = {
       clearEvents: function() {
         while(mockQueue) {
           var lastEvent = mockQueue.dequeue();
-          lastEvent.value();
-          mockQueue = lastEvent.next;
+          if (lastEvent) {
+            lastEvent.value();
+            mockQueue = lastEvent.next;
+          } else {
+            mockQueue = null;
+          }
         }
       }
     }
+
+    mockQueue.onEnqueue(function(queue, event) {
+      if (publicApi.logger) {
+        console.info('Segment.io event tracked', event);
+      }
+    });
 
     return publicApi;
   }

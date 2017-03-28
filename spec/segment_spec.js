@@ -542,6 +542,32 @@ describe('test mock', function() {
   var segment;
 
   beforeEach(function() {
-    segment = Segment.gettestMockClient(key, null, btoa);
+    segment = Segment.getTestMockClient('', null, btoa);
+  });
+
+  describe('#inspect', function() {
+    if ('should be object', function() {
+      expect(typeof segment.inspect).toEqual('object');
+    });
+
+    describe("#allEvents", function() {
+      it('should include indentify and track', function(done) {
+        segment.identify('test');
+        segment.track('hi').then(() => {
+          const events = segment.inspect.allEvents().map(i => i.type);
+          expect(events).toEqual(['identify', 'track']);
+          done();
+        });
+      });
+
+      it('should include indentify and track in right order', function(done) {
+        segment.track('hi');
+        segment.identify('test').then(() => {
+          const events = segment.inspect.allEvents().map(i => i.type);
+          expect(events).toEqual(['track', 'identify']);
+          done();
+        });
+      });
+    });
   });
 });
