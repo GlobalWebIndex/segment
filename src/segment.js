@@ -46,7 +46,7 @@ function constructAdapter(mockQueue, key, btoa, options) {
       );
     });
 
-    merger.timeout = options.timeout || 100;
+    merger.timeout = options && options.timeout ? options.timeout : 100;
 
     body.type = type;
     return merger.add(body).then();

@@ -52,7 +52,7 @@ describe('Segment', function() {
         });
 
         it('should call identify', function() {
-          var calls = fetchMock._calls[batchUrl]
+          var calls = fetchMock._calls[batchUrl];
 
           expect(calls.length).toEqual(1);
 
@@ -96,7 +96,7 @@ describe('Segment', function() {
         });
 
         it('should call track', function() {
-          var calls = fetchMock._calls[batchUrl]
+          var calls = fetchMock._calls[batchUrl];
 
           expect(calls.length).toEqual(2);
 
@@ -140,7 +140,7 @@ describe('Segment', function() {
         });
 
         it('should call page', function() {
-          var calls = fetchMock._calls[batchUrl]
+          var calls = fetchMock._calls[batchUrl];
 
           expect(calls.length).toEqual(2);
 
@@ -171,382 +171,424 @@ describe('Segment', function() {
       });
     });
 
-    // describe('anonymous events', function() {
-    //   var anonymousId;
+    describe('anonymous events', function() {
+      var anonymousId;
 
-    //   beforeEach(function(){
-    //     anonymousId = 'abcdxyz';
-    //   });
+      beforeEach(function(){
+        anonymousId = 'abcdxyz';
+      });
 
-    //   describe('#anonymousTrack', function() {
-    //     var event, properties;
+      describe('#anonymousTrack', function() {
+        var event, properties;
 
-    //     beforeEach(function() {
-    //       event = 'Something happened';
+        beforeEach(function(done) {
+          event = 'Something happened';
 
-    //       properties = {
-    //         location: 'here'
-    //       };
+          properties = {
+            location: 'here'
+          };
 
-    //       segment.anonymousTrack(anonymousId, event, properties);
-    //     });
+          segment.anonymousTrack(anonymousId, event, properties).then(done);
+        });
 
-    //     it('should call track', function() {
-    //       var calls = fetchMock._calls[trackUrl]
+        it('should call track', function() {
+          var calls = fetchMock._calls[batchUrl];
 
-    //       expect(calls.length).toEqual(1);
+          expect(calls.length).toEqual(1);
 
-    //       matchSegmentCall(calls[0][1], {
-    //         method: 'POST',
-    //         headers: {
-    //           Authorization: 'Basic ' + btoa(key + ':'),
-    //           'Content-Type': 'application/json'
-    //         },
-    //         body: {
-    //           anonymousId: anonymousId,
-    //           event: event,
-    //           properties: properties,
-    //           context: {
-    //             library: {
-    //               name: segment.name,
-    //               version: segment.version
-    //             }
-    //           }
-    //         }
-    //       });
-    //     });
-    //   });
+          matchSegmentCall(calls[0][1], {
+            method: 'POST',
+            headers: {
+              Authorization: 'Basic ' + btoa(key + ':'),
+              'Content-Type': 'application/json'
+            },
+            body: {
+              batch: [
+                {
+                  anonymousId: anonymousId,
+                  event: event,
+                  type: 'track',
+                  properties: properties,
+                }
+              ],
+              context: {
+                library: {
+                  name: segment.name,
+                  version: segment.version
+                }
+              }
+            }
+          });
+        });
+      });
 
-    //   describe('#anonymousPage', function() {
-    //     var name, properties;
+      describe('#anonymousPage', function() {
+        var name, properties;
 
-    //     beforeEach(function() {
-    //       name = 'Index page';
-    //       properties = {
-    //         search: 'for something'
-    //       }
+        beforeEach(function(done) {
+          name = 'Index page';
+          properties = {
+            search: 'for something'
+          }
 
-    //       segment.anonymousPage(anonymousId, name, properties);
-    //     });
+          segment.anonymousPage(anonymousId, name, properties).then(done);
+        });
 
-    //     it('should call page', function() {
-    //       var calls = fetchMock._calls[pageUrl]
+        it('should call page', function() {
+          var calls = fetchMock._calls[batchUrl];
 
-    //       expect(calls.length).toEqual(1);
+          expect(calls.length).toEqual(1);
 
-    //       matchSegmentCall(calls[0][1], {
-    //         method: 'POST',
-    //         headers: {
-    //           Authorization: 'Basic ' + btoa(key + ':'),
-    //           'Content-Type': 'application/json'
-    //         },
-    //         body: {
-    //           anonymousId: anonymousId,
-    //           name: name,
-    //           properties: properties,
-    //           context: {
-    //             library: {
-    //               name: segment.name,
-    //               version: segment.version
-    //             }
-    //           }
-    //         }
-    //       });
-    //     });
-    //   });
-    // });
+          matchSegmentCall(calls[0][1], {
+            method: 'POST',
+            headers: {
+              Authorization: 'Basic ' + btoa(key + ':'),
+              'Content-Type': 'application/json'
+            },
+            body: {
+              batch: [
+                {
+                  anonymousId: anonymousId,
+                  name: name,
+                  type: 'page',
+                  properties: properties,
+                }
+              ],
+              context: {
+                library: {
+                  name: segment.name,
+                  version: segment.version
+                }
+              }
+            }
+          });
+        });
+      });
+    });
   });
 
-  // describe('with custom context', function() {
-  //   var app, libraryName, libraryVersion, context;
+  describe('with custom context', function() {
+    var app, libraryName, libraryVersion, context;
 
-  //   beforeEach(function(){
-  //     app = 'my-supreme-app';
-  //     libraryName = 'some-custom-name';
-  //     libraryVersion = '-1.1.1';
+    beforeEach(function(){
+      app = 'my-supreme-app';
+      libraryName = 'some-custom-name';
+      libraryVersion = '-1.1.1';
 
-  //     context = {
-  //       app: app,
-  //       library: {
-  //         name: libraryName,
-  //         version: libraryVersion
-  //       }
-  //     }
+      context = {
+        app: app,
+        library: {
+          name: libraryName,
+          version: libraryVersion
+        }
+      }
 
-  //     segment = Segment.getClient(key, context, btoa);
-  //   });
+      segment = Segment.getClient(key, context, btoa, { timeout: 0 });
+    });
 
-  //   describe('user events', function() {
-  //     var userId;
+    describe('user events', function() {
+      var userId;
 
-  //     beforeEach(function() {
-  //       userId = 'jon.snow';
-  //     });
+      beforeEach(function() {
+        userId = 'jon.snow';
+      });
 
-  //     describe('#identify', function() {
-  //       var traits;
+      describe('#identify', function() {
+        var traits;
 
-  //       beforeEach(function() {
-  //         traits = {
-  //           swordsman: true
-  //         };
+        beforeEach(function(done) {
+          traits = {
+            swordsman: true
+          };
 
-  //         segment.identify(userId, traits);
-  //       });
+          segment.identify(userId, traits).then(done);
+        });
 
-  //       it('should call identify', function() {
-  //         var calls = fetchMock._calls[identifyUrl]
+        it('should call identify', function() {
+          var calls = fetchMock._calls[batchUrl];
 
-  //         expect(calls.length).toEqual(1);
+          expect(calls.length).toEqual(1);
 
-  //         matchSegmentCall(calls[0][1], {
-  //           method: 'POST',
-  //           headers: {
-  //             Authorization: 'Basic ' + btoa(key + ':'),
-  //             'Content-Type': 'application/json'
-  //           },
-  //           body: {
-  //             userId: userId,
-  //             traits: traits,
-  //             context: {
-  //               app: app,
-  //               library: {
-  //                 name: segment.name,        // Does not allow overwriting these
-  //                 version: segment.version   // Does not allow overwriting these
-  //               }
-  //             }
-  //           }
-  //         });
-  //       });
-  //     });
+          matchSegmentCall(calls[0][1], {
+            method: 'POST',
+            headers: {
+              Authorization: 'Basic ' + btoa(key + ':'),
+              'Content-Type': 'application/json'
+            },
+            body: {
+              batch: [
+                {
+                  userId: userId,
+                  traits: traits,
+                  type: 'identify',
+                }
+              ],
+              context: {
+                app: app,
+                library: {
+                  name: segment.name,        // Does not allow overwriting these
+                  version: segment.version   // Does not allow overwriting these
+                }
+              }
+            }
+          });
+        });
+      });
 
-  //     describe('#track', function() {
-  //       var event, properties;
+      describe('#track', function() {
+        var event, properties;
 
-  //       beforeEach(function() {
-  //         event = 'Something happened';
+        beforeEach(function(done) {
+          event = 'Something happened';
 
-  //         properties = {
-  //           location: 'here'
-  //         };
+          properties = {
+            location: 'here'
+          };
 
-  //         segment.identify(userId);
-  //         segment.track(event, properties);
-  //       });
+          segment.identify(userId);
+          segment.track(event, properties).then(done);
+        });
 
-  //       it('should call track', function() {
-  //         var calls = fetchMock._calls[trackUrl]
+        it('should call track', function() {
+          var calls = fetchMock._calls[batchUrl];
 
-  //         expect(calls.length).toEqual(1);
+          expect(calls.length).toEqual(2);
 
-  //         matchSegmentCall(calls[0][1], {
-  //           method: 'POST',
-  //           headers: {
-  //             Authorization: 'Basic ' + btoa(key + ':'),
-  //             'Content-Type': 'application/json'
-  //           },
-  //           body: {
-  //             userId: userId,
-  //             event: event,
-  //             properties: properties,
-  //             context: {
-  //               app: app,
-  //               library: {
-  //                 name: segment.name,        // Does not allow overwriting these
-  //                 version: segment.version   // Does not allow overwriting these
-  //               }
-  //             }
-  //           }
-  //         });
-  //       });
-  //     });
+          matchSegmentCall(calls[1][1], {
+            method: 'POST',
+            headers: {
+              Authorization: 'Basic ' + btoa(key + ':'),
+              'Content-Type': 'application/json'
+            },
+            body: {
+              batch: [
+                {
+                  userId: userId,
+                  event: event,
+                  properties: properties,
+                  type: 'track'
+                }
+              ],
+              context: {
+                app: app,
+                library: {
+                  name: segment.name,        // Does not allow overwriting these
+                  version: segment.version   // Does not allow overwriting these
+                }
+              }
+            }
+          });
+        });
+      });
 
-  //     describe('#page', function() {
-  //       var name, properties;
+      describe('#page', function() {
+        var name, properties;
 
-  //       beforeEach(function() {
-  //         name = 'Index page';
-  //         properties = {
-  //           search: 'for something'
-  //         }
+        beforeEach(function(done) {
+          name = 'Index page';
+          properties = {
+            search: 'for something'
+          }
 
-  //         segment.identify(userId);
-  //         segment.page(name, properties);
-  //       });
+          segment.identify(userId);
+          segment.page(name, properties).then(done);
+        });
 
-  //       it('should call page', function() {
-  //         var calls = fetchMock._calls[pageUrl]
+        it('should call page', function() {
+          var calls = fetchMock._calls[batchUrl];
 
-  //         expect(calls.length).toEqual(1);
+          expect(calls.length).toEqual(2);
 
-  //         matchSegmentCall(calls[0][1], {
-  //           method: 'POST',
-  //           headers: {
-  //             Authorization: 'Basic ' + btoa(key + ':'),
-  //             'Content-Type': 'application/json'
-  //           },
-  //           body: {
-  //             userId: userId,
-  //             name: name,
-  //             properties: properties,
-  //             context: {
-  //               app: app,
-  //               library: {
-  //                 name: segment.name,        // Does not allow overwriting these
-  //                 version: segment.version   // Does not allow overwriting these
-  //               }
-  //             }
-  //           }
-  //         });
-  //       });
-  //     });
-  //   });
+          matchSegmentCall(calls[1][1], {
+            method: 'POST',
+            headers: {
+              Authorization: 'Basic ' + btoa(key + ':'),
+              'Content-Type': 'application/json'
+            },
+            body: {
+              batch: [
+                {
+                  userId: userId,
+                  name: name,
+                  properties: properties,
+                  type: 'page'
+                }
+              ],
+              context: {
+                app: app,
+                library: {
+                  name: segment.name,        // Does not allow overwriting these
+                  version: segment.version   // Does not allow overwriting these
+                }
+              }
+            }
+          });
+        });
+      });
+    });
 
-  //   describe('anonymous events', function() {
-  //     var anonymousId;
+    describe('anonymous events', function() {
+      var anonymousId;
 
-  //     beforeEach(function() {
-  //       anonymousId = 'abcdxyz';
-  //     });
+      beforeEach(function() {
+        anonymousId = 'abcdxyz';
+      });
 
-  //     describe('#anonymousTrack', function() {
-  //       var event, properties;
+      describe('#anonymousTrack', function() {
+        var event, properties;
 
-  //       beforeEach(function() {
-  //         event = 'Something happened';
+        beforeEach(function(done) {
+          event = 'Something happened';
 
-  //         properties = {
-  //           location: 'here'
-  //         };
+          properties = {
+            location: 'here'
+          };
 
-  //         segment.anonymousTrack(anonymousId, event, properties);
-  //       });
+          segment.anonymousTrack(anonymousId, event, properties).then(done);
+        });
 
-  //       it('should call track', function() {
-  //         var calls = fetchMock._calls[trackUrl]
+        it('should call track', function() {
+          var calls = fetchMock._calls[batchUrl];
 
-  //         expect(calls.length).toEqual(1);
+          expect(calls.length).toEqual(1);
 
-  //         matchSegmentCall(calls[0][1], {
-  //           method: 'POST',
-  //           headers: {
-  //             Authorization: 'Basic ' + btoa(key + ':'),
-  //             'Content-Type': 'application/json'
-  //           },
-  //           body: {
-  //             anonymousId: anonymousId,
-  //             event: event,
-  //             properties: properties,
-  //             context: {
-  //               app: app,
-  //               library: {
-  //                 name: segment.name,        // Does not allow overwriting these
-  //                 version: segment.version   // Does not allow overwriting these
-  //               }
-  //             }
-  //           }
-  //         });
-  //       });
-  //     });
+          matchSegmentCall(calls[0][1], {
+            method: 'POST',
+            headers: {
+              Authorization: 'Basic ' + btoa(key + ':'),
+              'Content-Type': 'application/json'
+            },
+            body: {
+              batch: [
+                {
+                  anonymousId: anonymousId,
+                  event: event,
+                  properties: properties,
+                  type: 'track'
+                }
+              ],
+              context: {
+                app: app,
+                library: {
+                  name: segment.name,        // Does not allow overwriting these
+                  version: segment.version   // Does not allow overwriting these
+                }
+              }
+            }
+          });
+        });
+      });
 
-  //     describe('#anonymousPage', function() {
-  //       var name, properties;
+      describe('#anonymousPage', function() {
+        var name, properties;
 
-  //       beforeEach(function() {
-  //         name = 'Index page';
-  //         properties = {
-  //           search: 'for something'
-  //         }
+        beforeEach(function(done) {
+          name = 'Index page';
+          properties = {
+            search: 'for something'
+          }
 
-  //         segment.anonymousPage(anonymousId, name, properties);
-  //       });
+          segment.anonymousPage(anonymousId, name, properties).then(done);
+        });
 
-  //       it('should call page', function() {
-  //         var calls = fetchMock._calls[pageUrl]
+        it('should call page', function() {
+          var calls = fetchMock._calls[batchUrl];
 
-  //         expect(calls.length).toEqual(1);
+          expect(calls.length).toEqual(1);
 
-  //         matchSegmentCall(calls[0][1], {
-  //           method: 'POST',
-  //           headers: {
-  //             Authorization: 'Basic ' + btoa(key + ':'),
-  //             'Content-Type': 'application/json'
-  //           },
-  //           body: {
-  //             anonymousId: anonymousId,
-  //             name: name,
-  //             properties: properties,
-  //             context: {
-  //               app: app,
-  //               library: {
-  //                 name: segment.name,        // Does not allow overwriting these
-  //                 version: segment.version   // Does not allow overwriting these
-  //               }
-  //             }
-  //           }
-  //         });
-  //       });
-  //     });
-  //   });
-  // });
+          matchSegmentCall(calls[0][1], {
+            method: 'POST',
+            headers: {
+              Authorization: 'Basic ' + btoa(key + ':'),
+              'Content-Type': 'application/json'
+            },
+            body: {
+              batch: [
+                {
+                  anonymousId: anonymousId,
+                  name: name,
+                  properties: properties,
+                  type: 'page'
+                }
+              ],
+              context: {
+                app: app,
+                library: {
+                  name: segment.name,        // Does not allow overwriting these
+                  version: segment.version   // Does not allow overwriting these
+                }
+              }
+            }
+          });
+        });
+      });
+    });
+  });
 
-  // describe('Promise API', function() {
-  //   var properties;
+  describe('Promise API', function() {
+    var properties;
 
-  //   beforeEach(function() {
-  //     segment = Segment.getClient(key, null, btoa);
+    beforeEach(function() {
+      segment = Segment.getClient(key, null, btoa);
 
-  //     properties = {
-  //       location: 'here'
-  //     };
-  //   });
+      properties = {
+        location: 'here'
+      };
+    });
 
-  //   it('should resolve promises in right order', function(done) {
-  //     var resolved = [];
+    it('should resolve promises in right order', function(done) {
+      var resolved = [];
 
-  //     segment.track('first', properties).then(() => {
-  //       resolved.push(0);
-  //     });
+      segment.track('first', properties).then(() => {
+        resolved.push(0);
+      });
 
-  //     segment.track('second', properties).then(() => {
-  //       resolved.push(1);
-  //     });
+      segment.track('second', properties).then(() => {
+        resolved.push(1);
+      });
 
-  //     segment.track('third', properties).then(() => {
-  //       resolved.push(2);
+      segment.track('third', properties).then(() => {
+        resolved.push(2);
 
-  //       expect(resolved).toEqual([0,1,2], 'Tracked in right order');
-  //       done();
-  //     });
+        expect(resolved).toEqual([0,1,2], 'Tracked in right order');
 
-  //     // identify called after tracks
-  //     segment.identify(userId);
+        // track all data
+        var calls = fetchMock._calls[batchUrl]
 
-  //     // track all data
-  //     var calls = fetchMock._calls[trackUrl]
+        expect(calls.length).toEqual(4);
 
-  //     expect(calls.length).toEqual(3);
+        matchSegmentCall(calls[0][1], {
+          method: 'POST',
+          headers: {
+            Authorization: 'Basic ' + btoa(key + ':'),
+            'Content-Type': 'application/json'
+          },
+          body: {
+            batch: [
+              {
+                userId: userId,
+                event: 'first',
+                properties: properties,
+                type: 'track'
+              }
+            ],
+            context: {
+              library: {
+                name: segment.name,
+                version: segment.version
+              }
+            }
+          }
+        });
 
-  //     matchSegmentCall(calls[0][1], {
-  //       method: 'POST',
-  //       headers: {
-  //         Authorization: 'Basic ' + btoa(key + ':'),
-  //         'Content-Type': 'application/json'
-  //       },
-  //       body: {
-  //         userId: userId,
-  //         event: 'first',
-  //         properties: properties,
-  //         context: {
-  //           library: {
-  //             name: segment.name,
-  //             version: segment.version
-  //           }
-  //         }
-  //       }
-  //     });
-  //   });
-  // });
+        done();
+      });
+
+      // identify called after tracks
+      segment.identify(userId);
+
+    });
+  });
 });
 
 describe('test mock', function() {
