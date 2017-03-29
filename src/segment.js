@@ -1,6 +1,7 @@
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
 var Queue = require('./utils/queue');
+var Merger = require('./utils/merger');
 
 // library meta
 var library = {
@@ -11,6 +12,7 @@ var library = {
 function constructAdapter(mockQueue, key, btoa) {
   // api settings
   btoa = btoa || window.btoa;
+
   var baseUrl = 'https://api.segment.io/v1/';
   var method = 'POST';
   var headers = {
@@ -32,14 +34,20 @@ function constructAdapter(mockQueue, key, btoa) {
     }
 
     // reqular segment adapter
-    return fetch(
-      baseUrl + type,
-      {
-        method: method,
-        headers: headers,
-        body: JSON.stringify(body)
-      }
-    );
+
+    var merger = Merger(function(events) {
+      return fetch(
+        baseUrl + 'bulk',
+        {
+          method: method,
+          headers: headers,
+          body: JSON.stringify({ batch: events })
+        }
+      )
+    });
+
+    body.type = type;
+    return merger.add(body).then();
   }
 }
 

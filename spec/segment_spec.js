@@ -17,19 +17,15 @@ function matchSegmentCall(actualData, expectedData) {
 
 describe('Segment', function() {
   var segment, key;
-  var identifyUrl, trackUrl, pageUrl;
+  var bulkUrl;
 
   beforeEach(function() {
     key = '123';
 
-    identifyUrl = 'https://api.segment.io/v1/identify';
-    trackUrl = 'https://api.segment.io/v1/track';
-    pageUrl = 'https://api.segment.io/v1/page';
+    bulkUrl = 'https://api.segment.io/v1/bulk';
 
     fetchMock
-      .mock(identifyUrl, 200)
-      .mock(trackUrl, 200)
-      .mock(pageUrl, 200)
+      .mock(bulkUrl, 200);
   });
 
   afterEach(function() {
@@ -46,17 +42,17 @@ describe('Segment', function() {
       describe('#identify', function() {
         var traits;
 
-        beforeEach(function() {
+        beforeEach(function(done) {
           userId = 'jon.snow';
           traits = {
             swordsman: true
           };
 
-          segment.identify(userId, traits);
+          segment.identify(userId, traits).then(done);
         });
 
         it('should call identify', function() {
-          var calls = fetchMock._calls[identifyUrl]
+          var calls = fetchMock._calls[bulkUrl]
 
           expect(calls.length).toEqual(1);
 
@@ -67,11 +63,16 @@ describe('Segment', function() {
               'Content-Type': 'application/json'
             },
             body: {
-              userId: userId,
-              traits: traits,
+              batch: [
+                {
+                  userId: userId,
+                  event: 'identify',
+                }
+              ],
               context: {
                 library: {
                   name: segment.name,
+                  traits: traits,
                   version: segment.version
                 }
               }
