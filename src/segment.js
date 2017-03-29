@@ -9,7 +9,7 @@ var library = {
   version: '2.0.0-alpha2'
 }
 
-function constructAdapter(mockQueue, key, btoa) {
+function constructAdapter(mockQueue, key, btoa, options) {
   // api settings
   btoa = btoa || window.btoa;
 
@@ -20,7 +20,7 @@ function constructAdapter(mockQueue, key, btoa) {
     'Content-Type': 'application/json'
   };
 
-  return function(type, body) {
+  return function(context, type, body) {
     // test mock adapter
     if (mockQueue) {
       return new Promise(function(resolve) {
@@ -37,14 +37,16 @@ function constructAdapter(mockQueue, key, btoa) {
 
     var merger = Merger(function(events) {
       return fetch(
-        baseUrl + 'bulk',
+        baseUrl + 'batch',
         {
           method: method,
           headers: headers,
-          body: JSON.stringify({ batch: events })
+          body: JSON.stringify({ batch: events, context: context })
         }
-      )
+      );
     });
+
+    merger.timeout = options.timeout || 100;
 
     body.type = type;
     return merger.add(body).then();
@@ -62,8 +64,7 @@ function Constructor(adapter, context) {
   context.library.version = library.version;
 
   function apiCall(type, body) {
-    body.context = context;
-    return adapter(type, body);
+    return adapter(context, type, body);
   }
 
   function lazyApiCall(type, body) {
@@ -136,8 +137,8 @@ function Constructor(adapter, context) {
 
 // constructor
 module.exports = {
-  getClient: function(key, context, btoa) {
-    return Constructor(constructAdapter(false, key, btoa), context);
+  getClient: function(key, context, btoa, options) {
+    return Constructor(constructAdapter(false, key, btoa, options), context);
   },
 
   getTestMockClient: function(key, context, btoa) {
