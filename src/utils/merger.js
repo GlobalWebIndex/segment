@@ -1,6 +1,8 @@
 var Promise = require('es6-promise');
 
 function Merger(mainResolve) {
+  mainResolve = mainResolve || function(result) { return result };
+
   // initial state
   var state = [];
 
