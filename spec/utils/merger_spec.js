@@ -49,7 +49,7 @@ describe('Merger', function() {
   });
 
   describe('State issolation', function() {
-    var result1, result2;
+    var result1, result2, callbacks = [];
 
     beforeEach(function(done) {
       merger = Merger(function(merged) {
@@ -57,20 +57,24 @@ describe('Merger', function() {
           result1 = merged;
         } else {
           result2 = merged;
-          done();
         }
       });
 
-      merger.add(1);
+      merger.add(1).then(() => callbacks.push(1));
       merger.add(2).then(() => {
-        merger.add(3);
-        merger.add(4);
+        merger.add(3).then(() => callbacks.push(3));
+        merger.add(4).then(() => {
+          callbacks.push(4);
+          done();
+        });
+        callbacks.push(2);
       });
     });
 
     it('should isolate state of first and secont sequence', function() {
       expect(result1).toEqual([1,2]);
       expect(result2).toEqual([3,4]);
+      expect(callbacks).toEqual([1,2,3,4]);
     });
   });
 });
