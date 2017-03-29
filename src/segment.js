@@ -6,7 +6,7 @@ var Merger = require('./utils/merger');
 // library meta
 var library = {
   name: 'gwi',
-  version: '2.0.0-alpha2'
+  version: '2.0.0-alpha3'
 }
 
 function constructAdapter(mockQueue, context, key, btoa, options) {
