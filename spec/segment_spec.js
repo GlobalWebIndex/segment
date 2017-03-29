@@ -125,47 +125,51 @@ describe('Segment', function() {
           });
         });
       });
+
+      describe('#page', function() {
+        var name, properties;
+
+        beforeEach(function(done){
+          name = 'Index page';
+          properties = {
+            search: 'for something'
+          }
+
+          segment.identify(userId);
+          segment.page(name, properties).then(done);
+        });
+
+        it('should call page', function() {
+          var calls = fetchMock._calls[batchUrl]
+
+          expect(calls.length).toEqual(2);
+
+          matchSegmentCall(calls[1][1], {
+            method: 'POST',
+            headers: {
+              Authorization: 'Basic ' + btoa(key + ':'),
+              'Content-Type': 'application/json'
+            },
+            body: {
+              batch: [
+                {
+                  name: name,
+                  type: 'page',
+                  userId: userId,
+                  properties: properties,
+                }
+              ],
+              context: {
+                library: {
+                  name: segment.name,
+                  version: segment.version
+                }
+              }
+            }
+          });
+        });
+      });
     });
-
-    //   describe('#page', function() {
-    //     var name, properties;
-
-    //     beforeEach(function(){
-    //       name = 'Index page';
-    //       properties = {
-    //         search: 'for something'
-    //       }
-
-    //       segment.identify(userId);
-    //       segment.page(name, properties);
-    //     });
-
-    //     it('should call page', function() {
-    //       var calls = fetchMock._calls[pageUrl]
-
-    //       expect(calls.length).toEqual(1);
-
-    //       matchSegmentCall(calls[0][1], {
-    //         method: 'POST',
-    //         headers: {
-    //           Authorization: 'Basic ' + btoa(key + ':'),
-    //           'Content-Type': 'application/json'
-    //         },
-    //         body: {
-    //           userId: userId,
-    //           name: name,
-    //           properties: properties,
-    //           context: {
-    //             library: {
-    //               name: segment.name,
-    //               version: segment.version
-    //             }
-    //           }
-    //         }
-    //       });
-    //     });
-    //   });
-    // });
 
     // describe('anonymous events', function() {
     //   var anonymousId;
