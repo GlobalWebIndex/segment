@@ -7,7 +7,7 @@ describe('Merger', function() {
     var result;
 
     beforeEach(function(done) {
-      merger = Merger(function(merged) {
+      merger = Merger((merged) => {
         result = merged;
         done();
       });
@@ -26,7 +26,7 @@ describe('Merger', function() {
     var result = [];
 
     beforeEach(function(done) {
-      merger = Merger(function(merged) {
+      merger = Merger((merged) => {
         setTimeout(done, 0);
         return merged;
       });
@@ -52,7 +52,7 @@ describe('Merger', function() {
     var result1, result2, callbacks = [];
 
     beforeEach(function(done) {
-      merger = Merger(function(merged) {
+      merger = Merger((merged) => {
         if (!result1) {
           result1 = merged;
         } else {
@@ -75,6 +75,21 @@ describe('Merger', function() {
       expect(result1).toEqual([1,2]);
       expect(result2).toEqual([3,4]);
       expect(callbacks).toEqual([1,2,3,4]);
+    });
+  });
+
+  describe('async flow', function() {
+    var result;
+
+    beforeEach(function(done) {
+      merger = Merger((merged) => result = merged);
+
+      merger.add(1);
+      setTimeout(() => merger.add(2).then(done), merger.timeout / 2);
+    });
+
+    it('should be merged when happen in less than timout time', function() {
+      expect(result).toEqual([1,2]);
     });
   });
 });
