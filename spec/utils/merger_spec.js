@@ -92,4 +92,25 @@ describe('Merger', function() {
       expect(result).toEqual([1,2]);
     });
   });
+
+  describe('surrounded by promise', function() {
+    var result;
+
+    beforeEach(function(done) {
+      merger = Merger(merged => new Promise((resolve) => resolve(['OK', merged])));
+
+      merger.add(1);
+
+      merger.add(2)
+        .then() // resolving first Promise with identity (`a => a`)
+        .then(r => {
+          result = ['OK', r];
+          done();
+        });
+    });
+
+    it('should be resolved right', function() {
+      expect(result).toEqual(['OK', [1,2]]);
+    });
+  });
 });
