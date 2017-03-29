@@ -9,7 +9,7 @@ var library = {
   version: '2.0.0-alpha2'
 }
 
-function constructAdapter(mockQueue, key, btoa, options) {
+function constructAdapter(mockQueue, context, key, btoa, options) {
   // api settings
   btoa = btoa || window.btoa;
 
@@ -20,7 +20,22 @@ function constructAdapter(mockQueue, key, btoa, options) {
     'Content-Type': 'application/json'
   };
 
-  return function(context, type, body) {
+
+  // Batch request merging
+  var merger = Merger(function(events) {
+    return fetch(
+      baseUrl + 'batch',
+      {
+        method: method,
+        headers: headers,
+        body: JSON.stringify({ batch: events, context: context })
+      }
+    );
+  });
+
+  merger.timeout = options && options.timeout !== undefined ? options.timeout : 100;
+
+  return function(type, body) {
     // test mock adapter
     if (mockQueue) {
       return new Promise(function(resolve) {
@@ -34,38 +49,26 @@ function constructAdapter(mockQueue, key, btoa, options) {
     }
 
     // reqular segment adapter
-
-    var merger = Merger(function(events) {
-      return fetch(
-        baseUrl + 'batch',
-        {
-          method: method,
-          headers: headers,
-          body: JSON.stringify({ batch: events, context: context })
-        }
-      );
-    });
-
-    merger.timeout = options && options.timeout ? options.timeout : 100;
-
     body.type = type;
-    return merger.add(body).then();
+    return merger.add(body);
   }
 }
 
-function Constructor(adapter, context) {
-  var userId = 'anonymous';
-  var queue = Queue();
-
+function buildContext(context) {
   // meta
   context = context || {};
   context.library = context.library || {};
   context.library.name = library.name;
   context.library.version = library.version;
 
-  function apiCall(type, body) {
-    return adapter(context, type, body);
-  }
+  return context;
+}
+
+function Constructor(adapter) {
+  var userId = 'anonymous';
+  var queue = Queue();
+
+  var apiCall = adapter;
 
   function lazyApiCall(type, body) {
     return new Promise(function(resolve, reject) {
@@ -138,13 +141,13 @@ function Constructor(adapter, context) {
 // constructor
 module.exports = {
   getClient: function(key, context, btoa, options) {
-    return Constructor(constructAdapter(false, key, btoa, options), context);
+    return Constructor(constructAdapter(false, buildContext(context), key, btoa, options));
   },
 
   getTestMockClient: function(key, context, btoa) {
     mockQueue = Queue();
 
-    var publicApi = Constructor(constructAdapter(mockQueue, key, btoa), context);
+    var publicApi = Constructor(constructAdapter(mockQueue, buildContext(context), key, btoa));
 
     // set simple flag
     publicApi.mock = true;

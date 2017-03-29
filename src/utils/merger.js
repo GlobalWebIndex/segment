@@ -11,6 +11,7 @@ function Merger(mainResolve) {
 
     add: function(thing) {
       state.push(thing);
+
       return new Promise(function(resolve) {
         resetDebounce(function() {
           resolve(state);
@@ -20,13 +21,15 @@ function Merger(mainResolve) {
   };
 
   // debouncing
-  var timeout;
+  var timeout = null;
   var callBacks = [];
+
   function resetDebounce(callBack) {
     clearTimeout(timeout);
     callBacks.push(callBack);
 
-    timeout = setTimeout(function() {
+    function later() {
+      timeout = null;
       var result = mainResolve(state);
       callBacks.forEach(function(cb) {
         cb(result);
@@ -34,7 +37,13 @@ function Merger(mainResolve) {
 
       callBacks = [];
       state = [];
-    }, publicApi.timeout);
+    }
+
+    if (publicApi.timeout >= 0) {
+      timeout = setTimeout(later, publicApi.timeout);
+    } else {
+      later();
+    }
   }
 
   return publicApi;

@@ -34,7 +34,7 @@ describe('Segment', function() {
 
   describe('without custom context', function(){
     beforeEach(function() {
-      segment = Segment.getClient(key, null, btoa, { timeout: 0 });
+      segment = Segment.getClient(key, null, btoa, { timeout: -1 });
     });
 
     describe('user events', function() {
@@ -283,7 +283,7 @@ describe('Segment', function() {
         }
       }
 
-      segment = Segment.getClient(key, context, btoa, { timeout: 0 });
+      segment = Segment.getClient(key, context, btoa, { timeout: -1 });
     });
 
     describe('user events', function() {
@@ -529,7 +529,7 @@ describe('Segment', function() {
     var properties;
 
     beforeEach(function() {
-      segment = Segment.getClient(key, null, btoa);
+      segment = Segment.getClient(key, null, btoa, { timeout: -1 });
 
       properties = {
         location: 'here'
@@ -553,7 +553,7 @@ describe('Segment', function() {
         expect(resolved).toEqual([0,1,2], 'Tracked in right order');
 
         // track all data
-        var calls = fetchMock._calls[batchUrl]
+        var calls = fetchMock._calls[batchUrl];
 
         expect(calls.length).toEqual(4);
 
@@ -586,7 +586,63 @@ describe('Segment', function() {
 
       // identify called after tracks
       segment.identify(userId);
+    });
+  });
 
+  describe('batching works as expected', function() {
+    var userId;
+
+    beforeEach(function(done) {
+      userId = 'jon.show'
+      segment = Segment.getClient(key, null, btoa);
+
+      segment.identify(userId);
+      segment.page('home');
+      segment.track('first');
+      segment.track('second').then(done);
+    });
+
+    it('should send all requests in batch', function() {
+      var calls = fetchMock._calls[batchUrl];
+
+      expect(calls.length).toEqual(1);
+
+      matchSegmentCall(calls[0][1], {
+        method: 'POST',
+        headers: {
+          Authorization: 'Basic ' + btoa(key + ':'),
+          'Content-Type': 'application/json'
+        },
+        body: {
+          batch: [
+            {
+              userId: userId,
+              type: 'identify'
+            },
+            {
+              userId: userId,
+              type: 'page',
+              name: 'home'
+            },
+            {
+              userId: userId,
+              event: 'first',
+              type: 'track'
+            },
+            {
+              userId: userId,
+              event: 'second',
+              type: 'track'
+            }
+          ],
+          context: {
+            library: {
+              name: segment.name,
+              version: segment.version
+            }
+          }
+        }
+      });
     });
   });
 });

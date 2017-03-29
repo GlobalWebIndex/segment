@@ -49,10 +49,14 @@ describe('Merger', function() {
   });
 
   describe('State issolation', function() {
-    var result1, result2, callbacks = [];
+    var result1, result2, callbacks, called;
 
     beforeEach(function(done) {
+      callbacks = [];
+      called = 0;
+
       merger = Merger((merged) => {
+        called++;
         if (!result1) {
           result1 = merged;
         } else {
@@ -75,6 +79,7 @@ describe('Merger', function() {
       expect(result1).toEqual([1,2]);
       expect(result2).toEqual([3,4]);
       expect(callbacks).toEqual([1,2,3,4]);
+      expect(called).toEqual(2);
     });
   });
 
@@ -94,15 +99,18 @@ describe('Merger', function() {
   });
 
   describe('surrounded by promise', function() {
-    var result;
+    var result, called;
 
     beforeEach(function(done) {
-      merger = Merger(merged => new Promise((resolve) => resolve(['OK', merged])));
+      called = 0;
+      merger = Merger(merged => {
+        called++;
+        return new Promise((resolve) => resolve(['OK', merged]));
+      });
 
       merger.add(1);
 
       merger.add(2)
-        .then() // resolving first Promise with identity (`a => a`)
         .then(r => {
           result = ['OK', r];
           done();
@@ -110,7 +118,8 @@ describe('Merger', function() {
     });
 
     it('should be resolved right', function() {
-      expect(result).toEqual(['OK', [1,2]]);
+      expect(result).toEqual(['OK', [1, 2]]);
+      expect(called).toEqual(1);
     });
   });
 });
