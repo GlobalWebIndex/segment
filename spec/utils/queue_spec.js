@@ -83,8 +83,6 @@ describe('Queue', function() {
     });
 
     describe('unsubscribe', function() {
-      var queue = Queue();
-
       it('should not call calback after unsubscription', function(done) {
         var result;
 
@@ -102,6 +100,16 @@ describe('Queue', function() {
           done();
         }, 10);
       });
+    });
+  });
+
+  describe('#toArray', function() {
+    it('should return array', function() {
+      queue.enqueue(1);
+      queue.enqueue(2);
+      queue.enqueue(3);
+
+      expect(queue.toArray()).toEqual([1,2,3]);
     });
   });
 });
