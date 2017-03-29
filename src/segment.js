@@ -22,14 +22,12 @@ function constructAdapter(mockQueue, key, btoa) {
     // test mock adapter
     if (mockQueue) {
       return new Promise(function(resolve) {
-        setTimeout(function() {
-          mockQueue.enqueue({
-            type: type,
-            body: body
-          });
+        mockQueue.enqueue({
+          type: type,
+          body: body
+        });
 
-          resolve({ status: 200, body: { success: true } });
-        }, 0);
+        resolve({ status: 200, body: { success: true } });
       });
     }
 
@@ -151,18 +149,14 @@ module.exports = {
 
       lastEvent: function() {
         var array = mockQueue.toArray();
-        return array[0];
+        return array[array.length - 1];
       },
 
       clearEvents: function() {
-        while(mockQueue) {
-          var lastEvent = mockQueue.dequeue();
-          if (lastEvent) {
-            lastEvent.value();
-            mockQueue = lastEvent.next;
-          } else {
-            mockQueue = null;
-          }
+        var result = mockQueue.dequeue();
+        while(result.next) {
+          mockQueue = result.next;
+          result = result.next.dequeue();
         }
       }
     }

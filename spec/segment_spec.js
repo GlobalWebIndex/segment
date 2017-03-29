@@ -545,28 +545,77 @@ describe('test mock', function() {
     segment = Segment.getTestMockClient('', null, btoa);
   });
 
+  afterEach(function() {
+    segment.inspect.clearEvents();
+  });
+
   describe('#inspect', function() {
     if ('should be object', function() {
       expect(typeof segment.inspect).toEqual('object');
     });
 
     describe("#allEvents", function() {
-      it('should include indentify and track', function(done) {
+      it('should include indentify and track', function() {
         segment.identify('test');
-        segment.track('hi').then(() => {
-          const events = segment.inspect.allEvents().map(i => i.type);
-          expect(events).toEqual(['identify', 'track']);
-          done();
-        });
+        segment.track('hi')
+
+        const events = segment.inspect.allEvents().map(i => i.type);
+        expect(events).toEqual(['identify', 'track']);
       });
 
-      it('should include indentify and track in right order', function(done) {
+      it('should include indentify and track in right order', function() {
         segment.track('hi');
-        segment.identify('test').then(() => {
-          const events = segment.inspect.allEvents().map(i => i.type);
-          expect(events).toEqual(['track', 'identify']);
-          done();
-        });
+        segment.identify('test');
+
+        const events = segment.inspect.allEvents().map(i => i.type);
+        expect(events).toEqual(['track', 'identify']);
+      });
+
+      it('should be empty before identify is called', function() {
+        segment.track('hi');
+
+        expect(segment.inspect.allEvents()).toEqual([]);
+      });
+    });
+
+    describe('#lastEvent', function() {
+      beforeEach(function() {
+        segment.identify('test');
+      });
+
+      it('should contain track', function() {
+        segment.track('event', { foo: 'bar' });
+
+        var result = segment.inspect.lastEvent();
+
+        expect(result.type).toEqual('track');
+        expect(result.body.event).toEqual('event');
+        expect(result.body.properties.foo).toEqual('bar');
+      });
+
+      it('should be really last', function() {
+        segment.track('first', { foo: 'bar' });
+        segment.track('second', { bar: 'baz' });
+
+        var result = segment.inspect.lastEvent();
+
+        expect(result.type).toEqual('track');
+        expect(result.body.event).toEqual('second');
+        expect(result.body.properties.bar).toEqual('baz');
+      });
+    });
+
+    describe('#clearEvents', function() {
+      beforeEach(function() {
+        segment.identify('test');
+        segment.track('first');
+        segment.track('second');
+        segment.inspect.clearEvents();
+      });
+
+      it('should be empty', function() {
+        expect(segment.inspect.allEvents()).toEqual([]);
+        expect(segment.inspect.lastEvent()).toEqual(undefined);
       });
     });
   });
