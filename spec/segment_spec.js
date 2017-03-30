@@ -1,6 +1,7 @@
 var Segment = require('../src/segment');
 var fetchMock = require('fetch-mock');
 var btoa = require('btoa');
+var toEqualObject = require('./support/toEqualObject.js');
 
 function matchSegmentCall(actualData, expectedData) {
   expect(Object.keys(actualData)).toEqual(['method', 'headers', 'body']);
@@ -11,9 +12,13 @@ function matchSegmentCall(actualData, expectedData) {
     body = JSON.parse(actualData.body);
 
   expect(method).toEqual(expectedData.method);
-  expect(headers).toEqual(expectedData.headers);
-  expect(body).toEqual(expectedData.body);
+  expect(headers).toEqualObject(expectedData.headers);
+  expect(body).toEqualObject(expectedData.body);
 }
+
+beforeEach(function(){
+  jasmine.addMatchers(toEqualObject);
+})
 
 describe('Segment', function(){
   var segment, key;
