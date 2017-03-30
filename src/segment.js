@@ -1,7 +1,9 @@
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
+
 var Queue = require('./utils/queue');
 var Merger = require('./utils/merger');
+var btoa = require('btoa');
 
 // library meta
 var library = {
@@ -27,12 +29,10 @@ function withDefaultOptions(options) {
   return options;
 }
 
-function constructAdapter(mockQueue, key, btoa, options) {
+function constructAdapter(mockQueue, key, options) {
   options = withDefaultOptions(options);
 
   // api settings
-  btoa = btoa || window.btoa;
-
   var baseUrl = 'https://api.segment.io/v1/';
   var method = 'POST';
   var headers = {
@@ -149,14 +149,14 @@ function Constructor(adapter) {
 
 // constructor
 module.exports = {
-  getClient: function(key, btoa, options) {
-    return Constructor(constructAdapter(false, key, btoa, options));
+  getClient: function(key, options) {
+    return Constructor(constructAdapter(false, key, options));
   },
 
-  getTestMockClient: function(key, btoa, options) {
+  getTestMockClient: function(key, options) {
     mockQueue = Queue();
 
-    var publicApi = Constructor(constructAdapter(mockQueue, key, btoa, options));
+    var publicApi = Constructor(constructAdapter(mockQueue, key, options));
 
     // set simple flag
     publicApi.mock = true;
