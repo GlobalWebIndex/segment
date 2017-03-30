@@ -19,8 +19,16 @@ function buildContext(context) {
   return context;
 }
 
+function withDefaultOptions(options) {
+  options = options || {}
+  options.timeout = options.timeout !== undefined ? options.timeout : 100;
+
+  return options;
+}
+
 function constructAdapter(mockQueue, context, key, btoa, options) {
   context = buildContext(context);
+  options = withDefaultOptions(options);
 
   // api settings
   btoa = btoa || window.btoa;
@@ -31,7 +39,6 @@ function constructAdapter(mockQueue, context, key, btoa, options) {
     'Authorization': 'Basic ' + btoa(key + ':'),
     'Content-Type': 'application/json'
   };
-
 
   // Batch request merging
   var merger = Merger(function(events) {
@@ -45,7 +52,7 @@ function constructAdapter(mockQueue, context, key, btoa, options) {
     );
   });
 
-  merger.timeout = options && options.timeout !== undefined ? options.timeout : 100;
+  merger.timeout = options.timeout;
 
   return function(type, body) {
     // test mock adapter
