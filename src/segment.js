@@ -8,7 +8,7 @@ var btoa = require('btoa');
 // library meta
 var library = {
   name: 'gwi',
-  version: '2.0.0-alpha3'
+  version: '2.0.0-beta'
 }
 
 function buildContext(context) {
