@@ -1,9 +1,9 @@
 # Segment
 
 This is an unofficial alternative to [analytics.js](https://segment.com/docs/sources/website/analytics.js/) by [segment.io](https://segment.io).
-Unlike original implementation this library speaks with Segment's API directly and delegates responsibility of data distribution to back-end (as official Ruby, Java, Clojure, Python and more do).
-This helps you prevent many issues with data inconsistency between various back-ends and optimize number of HTTP payloads.
-This library also comes with few other improvements over official one namely it uses **batch api** to prevent issues with [rate limit](https://segment.com/docs/sources/server/http/#rate-limits),
+Unlike original implementation this library speaks with Segment's API directly and delegates responsibility of data distribution to back-end (as official Ruby, Java, Clojure, Python and many others do).
+This helps you to prevent many issues with data inconsistency between various back-ends and optimize number of HTTP payloads required for tracks.
+This library also comes with few other improvements over official one namely it uses **batch api** to prevent issues with [rate limits](https://segment.com/docs/sources/server/http/#rate-limits),
 prevents tracks without `userId` by using internal queue, has **Promise** API to make easy to reason about async actions and **comes with test mocks** you can use in your test suit.
 
 ## What if I actually want to track event before calling identify?
@@ -26,7 +26,7 @@ $ npm install gwi-segment --save
 
 In most cases you want to just initialize library and store instance to global singleton object like this:
 
-```
+```javascript
 const Segment = require('gwi-segment');
 
 window.segment = Segment.getClient('YOUR_SEGMENT_WRITE_KEY');
