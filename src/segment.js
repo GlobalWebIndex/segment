@@ -9,7 +9,19 @@ var library = {
   version: '2.0.0-alpha3'
 }
 
+function buildContext(context) {
+  // meta
+  context = context || {};
+  context.library = context.library || {};
+  context.library.name = library.name;
+  context.library.version = library.version;
+
+  return context;
+}
+
 function constructAdapter(mockQueue, context, key, btoa, options) {
+  context = buildContext(context);
+
   // api settings
   btoa = btoa || window.btoa;
 
@@ -52,16 +64,6 @@ function constructAdapter(mockQueue, context, key, btoa, options) {
     body.type = type;
     return merger.add(body);
   }
-}
-
-function buildContext(context) {
-  // meta
-  context = context || {};
-  context.library = context.library || {};
-  context.library.name = library.name;
-  context.library.version = library.version;
-
-  return context;
 }
 
 function Constructor(adapter) {
@@ -141,13 +143,13 @@ function Constructor(adapter) {
 // constructor
 module.exports = {
   getClient: function(key, context, btoa, options) {
-    return Constructor(constructAdapter(false, buildContext(context), key, btoa, options));
+    return Constructor(constructAdapter(false, context, key, btoa, options));
   },
 
   getTestMockClient: function(key, context, btoa) {
     mockQueue = Queue();
 
-    var publicApi = Constructor(constructAdapter(mockQueue, buildContext(context), key, btoa));
+    var publicApi = Constructor(constructAdapter(mockQueue, context, key, btoa));
 
     // set simple flag
     publicApi.mock = true;
