@@ -22,12 +22,12 @@ function buildContext(context) {
 function withDefaultOptions(options) {
   options = options || {}
   options.timeout = options.timeout !== undefined ? options.timeout : 100;
+  options.context = buildContext(options.context);
 
   return options;
 }
 
-function constructAdapter(mockQueue, context, key, btoa, options) {
-  context = buildContext(context);
+function constructAdapter(mockQueue, key, btoa, options) {
   options = withDefaultOptions(options);
 
   // api settings
@@ -47,7 +47,7 @@ function constructAdapter(mockQueue, context, key, btoa, options) {
       {
         method: method,
         headers: headers,
-        body: JSON.stringify({ batch: events, context: context })
+        body: JSON.stringify({ batch: events, context: options.context })
       }
     );
   });
@@ -149,14 +149,14 @@ function Constructor(adapter) {
 
 // constructor
 module.exports = {
-  getClient: function(key, context, btoa, options) {
-    return Constructor(constructAdapter(false, context, key, btoa, options));
+  getClient: function(key, btoa, options) {
+    return Constructor(constructAdapter(false, key, btoa, options));
   },
 
-  getTestMockClient: function(key, context, btoa) {
+  getTestMockClient: function(key, btoa, options) {
     mockQueue = Queue();
 
-    var publicApi = Constructor(constructAdapter(mockQueue, context, key, btoa));
+    var publicApi = Constructor(constructAdapter(mockQueue, key, btoa, options));
 
     // set simple flag
     publicApi.mock = true;
