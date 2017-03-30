@@ -698,8 +698,8 @@ describe('test mock', function() {
         var result = segment.inspect.lastEvent();
 
         expect(result.type).toEqual('track');
-        expect(result.body.event).toEqual('event');
-        expect(result.body.properties.foo).toEqual('bar');
+        expect(result.event).toEqual('event');
+        expect(result.properties.foo).toEqual('bar');
       });
 
       it('should be really last', function() {
@@ -709,8 +709,8 @@ describe('test mock', function() {
         var result = segment.inspect.lastEvent();
 
         expect(result.type).toEqual('track');
-        expect(result.body.event).toEqual('second');
-        expect(result.body.properties.bar).toEqual('baz');
+        expect(result.event).toEqual('second');
+        expect(result.properties.bar).toEqual('baz');
       });
     });
 

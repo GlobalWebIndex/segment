@@ -54,21 +54,17 @@ function constructAdapter(mockQueue, key, options) {
 
   merger.timeout = options.timeout;
 
-  return function(type, body) {
+  return function(body) {
     // test mock adapter
     if (mockQueue) {
       return new Promise(function(resolve) {
-        mockQueue.enqueue({
-          type: type,
-          body: body
-        });
+        mockQueue.enqueue(body);
 
         resolve({ status: 200, body: { success: true } });
       });
     }
 
     // reqular segment adapter
-    body.type = type;
     return merger.add(body);
   }
 }
@@ -77,7 +73,10 @@ function Constructor(adapter) {
   var userId = 'anonymous';
   var queue = Queue();
 
-  var apiCall = adapter;
+  function apiCall(type, body) {
+    body.type = type;
+    return adapter(body);
+  }
 
   function lazyApiCall(type, body) {
     return new Promise(function(resolve, reject) {
