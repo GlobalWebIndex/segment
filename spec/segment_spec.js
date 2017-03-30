@@ -16,7 +16,7 @@ function matchSegmentCall(actualData, expectedData) {
   expect(body).toEqualObject(expectedData.body);
 }
 
-beforeEach(function(){
+beforeAll(function(){
   jasmine.addMatchers(toEqualObject);
 })
 
