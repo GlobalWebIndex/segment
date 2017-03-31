@@ -1,16 +1,38 @@
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
+
 var Queue = require('./utils/queue');
+var Merger = require('./utils/merger');
+var btoa = require('btoa');
 
 // library meta
 var library = {
   name: 'gwi',
-  version: '2.0.0-alpha2'
+  version: '2.0.0'
+};
+
+function buildContext(context) {
+  // meta
+  context = context || {};
+  context.library = context.library || {};
+  context.library.name = library.name;
+  context.library.version = library.version;
+
+  return context;
 }
 
-function constructAdapter(mockQueue, key, btoa) {
+function withDefaultOptions(options) {
+  options = options || {}
+  options.timeout = options.timeout !== undefined ? options.timeout : 100;
+  options.context = buildContext(options.context);
+
+  return options;
+}
+
+function constructAdapter(mockQueue, key, options) {
+  options = withDefaultOptions(options);
+
   // api settings
-  btoa = btoa || window.btoa;
   var baseUrl = 'https://api.segment.io/v1/';
   var method = 'POST';
   var headers = {
@@ -18,44 +40,42 @@ function constructAdapter(mockQueue, key, btoa) {
     'Content-Type': 'application/json'
   };
 
-  return function(type, body) {
+  // Batch request merging
+  var merger = Merger(function(events) {
+    return fetch(
+      baseUrl + 'batch',
+      {
+        method: method,
+        headers: headers,
+        body: JSON.stringify({ batch: events, context: options.context })
+      }
+    );
+  });
+
+  merger.timeout = options.timeout;
+
+  return function(body) {
     // test mock adapter
     if (mockQueue) {
       return new Promise(function(resolve) {
-        mockQueue.enqueue({
-          type: type,
-          body: body
-        });
+        mockQueue.enqueue(body);
 
         resolve({ status: 200, body: { success: true } });
       });
     }
 
     // reqular segment adapter
-    return fetch(
-      baseUrl + type,
-      {
-        method: method,
-        headers: headers,
-        body: JSON.stringify(body)
-      }
-    );
+    return merger.add(body);
   }
 }
 
-function Constructor(adapter, context) {
+function Constructor(adapter) {
   var userId = 'anonymous';
   var queue = Queue();
 
-  // meta
-  context = context || {};
-  context.library = context.library || {};
-  context.library.name = library.name;
-  context.library.version = library.version;
-
   function apiCall(type, body) {
-    body.context = context;
-    return adapter(type, body);
+    body.type = type;
+    return adapter(body);
   }
 
   function lazyApiCall(type, body) {
@@ -128,14 +148,14 @@ function Constructor(adapter, context) {
 
 // constructor
 module.exports = {
-  getClient: function(key, context, btoa) {
-    return Constructor(constructAdapter(false, key, btoa), context);
+  getClient: function(key, options) {
+    return Constructor(constructAdapter(false, key, options));
   },
 
-  getTestMockClient: function(key, context, btoa) {
+  getTestMockClient: function(key, options) {
     mockQueue = Queue();
 
-    var publicApi = Constructor(constructAdapter(mockQueue, key, btoa), context);
+    var publicApi = Constructor(constructAdapter(mockQueue, key, options));
 
     // set simple flag
     publicApi.mock = true;

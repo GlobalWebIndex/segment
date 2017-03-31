@@ -1,6 +1,6 @@
 {
   "name": "gwi-segment",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Tracking library using Segment's HTTP API directly",
   "scripts": {
     "test": "jasmine"
@@ -21,11 +21,11 @@
   },
   "homepage": "https://github.com/GlobalWebIndex/segment#readme",
   "devDependencies": {
-    "btoa": "^1.1.2",
     "fetch-mock": "^5.9.4",
     "jasmine": "^2.5.3"
   },
   "dependencies": {
+    "btoa": "^1.1.2",
     "es6-promise": "^4.1.0",
     "isomorphic-fetch": "^2.2.1"
   }
