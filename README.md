@@ -1,6 +1,6 @@
-[![CircleCI](https://circleci.com/gh/GlobalWebIndex/segment/tree/master.svg?style=svg)](https://circleci.com/gh/GlobalWebIndex/segment/tree/master)
-
 # Segment
+
+[![CircleCI](https://circleci.com/gh/GlobalWebIndex/segment/tree/master.svg?style=svg)](https://circleci.com/gh/GlobalWebIndex/segment/tree/master)
 
 This is an unofficial alternative to [analytics.js](https://segment.com/docs/sources/website/analytics.js/) by [segment.io](https://segment.io).
 Unlike original implementation this library speaks with Segment's API directly and delegates responsibility of data distribution to back-end (as official Ruby, Java, Clojure, Python and many others do).
