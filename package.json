@@ -15,6 +15,9 @@
     "analytics"
   ],
   "author": "Jan Renra Gloser <jan@globalwebindex.net>",
+  "collaborators": [
+    Marek Fajkus <marek@globalwebindex.net>
+  ]
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/GlobalWebIndex/segment/issues"
