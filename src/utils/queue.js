@@ -29,6 +29,10 @@ function Queue() {
 
     size: function() {
       return state.length;
+    },
+
+    toArray: function() {
+      return state;
     }
   }
 
