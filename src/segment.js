@@ -1,13 +1,15 @@
 require('es6-promise').polyfill();
 require('isomorphic-fetch');
+
 var Queue = require('./utils/queue');
 var Merger = require('./utils/merger');
+var btoa = require('btoa');
 
 // library meta
 var library = {
   name: 'gwi',
-  version: '2.0.0-alpha3'
-}
+  version: '2.0.0'
+};
 
 function buildContext(context) {
   // meta
@@ -22,17 +24,15 @@ function buildContext(context) {
 function withDefaultOptions(options) {
   options = options || {}
   options.timeout = options.timeout !== undefined ? options.timeout : 100;
+  options.context = buildContext(options.context);
 
   return options;
 }
 
-function constructAdapter(mockQueue, context, key, btoa, options) {
-  context = buildContext(context);
+function constructAdapter(mockQueue, key, options) {
   options = withDefaultOptions(options);
 
   // api settings
-  btoa = btoa || window.btoa;
-
   var baseUrl = 'https://api.segment.io/v1/';
   var method = 'POST';
   var headers = {
@@ -47,28 +47,24 @@ function constructAdapter(mockQueue, context, key, btoa, options) {
       {
         method: method,
         headers: headers,
-        body: JSON.stringify({ batch: events, context: context })
+        body: JSON.stringify({ batch: events, context: options.context })
       }
     );
   });
 
   merger.timeout = options.timeout;
 
-  return function(type, body) {
+  return function(body) {
     // test mock adapter
     if (mockQueue) {
       return new Promise(function(resolve) {
-        mockQueue.enqueue({
-          type: type,
-          body: body
-        });
+        mockQueue.enqueue(body);
 
         resolve({ status: 200, body: { success: true } });
       });
     }
 
     // reqular segment adapter
-    body.type = type;
     return merger.add(body);
   }
 }
@@ -77,7 +73,10 @@ function Constructor(adapter) {
   var userId = 'anonymous';
   var queue = Queue();
 
-  var apiCall = adapter;
+  function apiCall(type, body) {
+    body.type = type;
+    return adapter(body);
+  }
 
   function lazyApiCall(type, body) {
     return new Promise(function(resolve, reject) {
@@ -149,14 +148,14 @@ function Constructor(adapter) {
 
 // constructor
 module.exports = {
-  getClient: function(key, context, btoa, options) {
-    return Constructor(constructAdapter(false, context, key, btoa, options));
+  getClient: function(key, options) {
+    return Constructor(constructAdapter(false, key, options));
   },
 
-  getTestMockClient: function(key, context, btoa) {
+  getTestMockClient: function(key, options) {
     mockQueue = Queue();
 
-    var publicApi = Constructor(constructAdapter(mockQueue, context, key, btoa));
+    var publicApi = Constructor(constructAdapter(mockQueue, key, options));
 
     // set simple flag
     publicApi.mock = true;

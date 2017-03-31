@@ -34,7 +34,7 @@ describe('Segment', function() {
 
   describe('without custom context', function(){
     beforeEach(function() {
-      segment = Segment.getClient(key, null, btoa, { timeout: -1 });
+      segment = Segment.getClient(key, { timeout: -1 });
     });
 
     describe('user events', function() {
@@ -283,7 +283,7 @@ describe('Segment', function() {
         }
       }
 
-      segment = Segment.getClient(key, context, btoa, { timeout: -1 });
+      segment = Segment.getClient(key, { timeout: -1, context: context });
     });
 
     describe('user events', function() {
@@ -529,7 +529,7 @@ describe('Segment', function() {
     var properties;
 
     beforeEach(function() {
-      segment = Segment.getClient(key, null, btoa, { timeout: -1 });
+      segment = Segment.getClient(key, { timeout: -1 });
 
       properties = {
         location: 'here'
@@ -594,7 +594,7 @@ describe('Segment', function() {
 
     beforeEach(function(done) {
       userId = 'jon.show'
-      segment = Segment.getClient(key, null, btoa);
+      segment = Segment.getClient(key);
 
       segment.identify(userId);
       segment.page('home');
@@ -651,7 +651,7 @@ describe('test mock', function() {
   var segment;
 
   beforeEach(function() {
-    segment = Segment.getTestMockClient('', null, btoa);
+    segment = Segment.getTestMockClient('');
   });
 
   afterEach(function() {
@@ -698,8 +698,8 @@ describe('test mock', function() {
         var result = segment.inspect.lastEvent();
 
         expect(result.type).toEqual('track');
-        expect(result.body.event).toEqual('event');
-        expect(result.body.properties.foo).toEqual('bar');
+        expect(result.event).toEqual('event');
+        expect(result.properties.foo).toEqual('bar');
       });
 
       it('should be really last', function() {
@@ -709,8 +709,8 @@ describe('test mock', function() {
         var result = segment.inspect.lastEvent();
 
         expect(result.type).toEqual('track');
-        expect(result.body.event).toEqual('second');
-        expect(result.body.properties.bar).toEqual('baz');
+        expect(result.event).toEqual('second');
+        expect(result.properties.bar).toEqual('baz');
       });
     });
 
