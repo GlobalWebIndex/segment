@@ -651,6 +651,26 @@ describe('Segment', function() {
       });
     });
   });
+
+  describe('#force', function() {
+    beforeEach(function() {
+      userId = 'jon.show'
+      calls = fetchMock._calls[batchUrl];
+      segment = Segment.getClient(key, { timeout: 9999999 });
+
+      segment.identify(userId);
+    });
+
+    it('should force batch request', function() {
+      segment.track('whatever');
+      calls = fetchMock._calls[batchUrl];
+      expect(calls).toEqual(undefined);
+
+      segment.force();
+      calls = fetchMock._calls[batchUrl];
+      expect(calls.length).toEqual(1);
+    });
+  });
 });
 
 describe('test mock', function() {

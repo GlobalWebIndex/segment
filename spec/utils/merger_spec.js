@@ -98,6 +98,29 @@ describe('Merger', function() {
     });
   });
 
+  describe('#force', function() {
+    var result;
+
+    beforeEach(function() {
+      merger = Merger((merged) => result = merged);
+
+      merger.add(1);
+    });
+
+    it('should be merged when happen in less than timout time', function(done) {
+      expect(result).toEqual(undefined);
+
+      merger.force();
+      expect(result).toEqual([1]);
+
+      // check state cleaning
+      merger.add(2).then((res) => {
+        expect(res).toEqual([2]);
+        done();
+      });
+    });
+  });
+
   describe('surrounded by promise', function() {
     var result, called;
 
