@@ -68,9 +68,7 @@ function constructAdapter(mockQueue, key, options) {
     return merger.add(body);
   }
 
-  publicApi.force = function() {
-    merger.force();
-  };
+  publicApi.force = merger.force;
 
   return publicApi;
 }
@@ -147,9 +145,7 @@ function Constructor(adapter) {
       });
     },
 
-    force: function() {
-      adapter.force();
-    },
+    force: adapter.force,
 
     version: library.version,
     name: library.name
