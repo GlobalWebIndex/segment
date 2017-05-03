@@ -2,11 +2,38 @@ var Promise = require('es6-promise');
 
 function Merger(mainResolve) {
   mainResolve = mainResolve || function(result) { return result };
+  var publicApi;
 
   // initial state
   var state = [];
 
-  var publicApi = {
+  // debouncing
+  var timeout = null;
+  var callBacks = [];
+
+  function later() {
+    timeout = null;
+    var result = mainResolve(state);
+    callBacks.forEach(function(cb) {
+      cb(result);
+    });
+
+    callBacks = [];
+    state = [];
+  }
+
+  function resetDebounce(callBack) {
+    clearTimeout(timeout);
+    callBacks.push(callBack);
+
+    if (publicApi.timeout >= 0) {
+      timeout = setTimeout(later, publicApi.timeout);
+    } else {
+      later();
+    }
+  }
+
+  publicApi = {
     timeout: 100,
 
     add: function(thing) {
@@ -17,34 +44,10 @@ function Merger(mainResolve) {
           resolve(state);
         });
       });
-    }
+    },
+
+    force: later
   };
-
-  // debouncing
-  var timeout = null;
-  var callBacks = [];
-
-  function resetDebounce(callBack) {
-    clearTimeout(timeout);
-    callBacks.push(callBack);
-
-    function later() {
-      timeout = null;
-      var result = mainResolve(state);
-      callBacks.forEach(function(cb) {
-        cb(result);
-      });
-
-      callBacks = [];
-      state = [];
-    }
-
-    if (publicApi.timeout >= 0) {
-      timeout = setTimeout(later, publicApi.timeout);
-    } else {
-      later();
-    }
-  }
 
   return publicApi;
 };

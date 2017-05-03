@@ -651,6 +651,27 @@ describe('Segment', function() {
       });
     });
   });
+
+  describe('#force', function() {
+    function getCalls() {
+      return fetchMock._calls[batchUrl];
+    }
+
+    beforeEach(function() {
+      userId = 'jon.show'
+      segment = Segment.getClient(key, { timeout: 9999999 });
+
+      segment.identify(userId);
+    });
+
+    it('should force batch request', function() {
+      segment.track('whatever');
+      expect(getCalls()).toEqual(undefined);
+
+      segment.force();
+      expect(getCalls().length).toEqual(1);
+    });
+  });
 });
 
 describe('test mock', function() {
@@ -662,6 +683,21 @@ describe('test mock', function() {
 
   afterEach(function() {
     segment.inspect.clearEvents();
+  });
+
+  describe('regular methods', function() {
+    function checkMethod(name) {
+      it ('has ' + name + ' method', function() {
+        expect(typeof segment[name]).toEqual('function');
+      });
+    }
+
+    checkMethod('identify');
+    checkMethod('track');
+    checkMethod('anonymousTrack');
+    checkMethod('page');
+    checkMethod('anonymousPage');
+    checkMethod('force');
   });
 
   describe('#inspect', function() {

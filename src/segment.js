@@ -54,7 +54,7 @@ function constructAdapter(mockQueue, key, options) {
 
   merger.timeout = options.timeout;
 
-  return function(body) {
+  var publicApi = function(body) {
     // test mock adapter
     if (mockQueue) {
       return new Promise(function(resolve) {
@@ -67,6 +67,10 @@ function constructAdapter(mockQueue, key, options) {
     // reqular segment adapter
     return merger.add(body);
   }
+
+  publicApi.force = merger.force;
+
+  return publicApi;
 }
 
 function Constructor(adapter) {
@@ -140,6 +144,8 @@ function Constructor(adapter) {
         properties: properties
       });
     },
+
+    force: adapter.force,
 
     version: library.version,
     name: library.name
