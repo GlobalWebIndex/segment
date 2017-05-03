@@ -6,24 +6,6 @@ function Merger(mainResolve) {
   // initial state
   var state = [];
 
-  var publicApi = {
-    timeout: 100,
-
-    add: function(thing) {
-      state.push(thing);
-
-      return new Promise(function(resolve) {
-        resetDebounce(function() {
-          resolve(state);
-        });
-      });
-    },
-
-    force: function() {
-      later();
-    }
-  };
-
   // debouncing
   var timeout = null;
   var callBacks = [];
@@ -49,6 +31,22 @@ function Merger(mainResolve) {
       later();
     }
   }
+
+  var publicApi = {
+    timeout: 100,
+
+    add: function(thing) {
+      state.push(thing);
+
+      return new Promise(function(resolve) {
+        resetDebounce(function() {
+          resolve(state);
+        });
+      });
+    },
+
+    force: later
+  };
 
   return publicApi;
 };
