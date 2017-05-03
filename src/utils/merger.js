@@ -2,6 +2,7 @@ var Promise = require('es6-promise');
 
 function Merger(mainResolve) {
   mainResolve = mainResolve || function(result) { return result };
+  var publicApi;
 
   // initial state
   var state = [];
@@ -32,7 +33,7 @@ function Merger(mainResolve) {
     }
   }
 
-  var publicApi = {
+  publicApi = {
     timeout: 100,
 
     add: function(thing) {

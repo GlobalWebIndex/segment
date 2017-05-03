@@ -158,6 +158,14 @@ const properties = {
 segment.anonymousPage(anonymousId, name, properties);
 ```
 
+### #force
+
+Send all equeued events in batch request immediately. This is usually useful before calling things like `location.reload();` or `location.href =`.
+
+*no arguments*
+
+**returns `undefined` (void).**
+
 ## How Queue and Waiting For UserId Works
 
 No `#track` nor `#page` call is proceed before `#identify` is called. This is to prevent events with missing `userId` to go through the system.

@@ -669,7 +669,6 @@ describe('Segment', function() {
       expect(getCalls()).toEqual(undefined);
 
       segment.force();
-      calls = fetchMock._calls[batchUrl];
       expect(getCalls().length).toEqual(1);
     });
   });
@@ -685,7 +684,6 @@ describe('test mock', function() {
   afterEach(function() {
     segment.inspect.clearEvents();
   });
-
 
   describe('regular methods', function() {
     function checkMethod(name) {
