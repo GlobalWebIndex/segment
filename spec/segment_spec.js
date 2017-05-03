@@ -653,9 +653,12 @@ describe('Segment', function() {
   });
 
   describe('#force', function() {
+    function getCalls() {
+      return fetchMock._calls[batchUrl];
+    }
+
     beforeEach(function() {
       userId = 'jon.show'
-      calls = fetchMock._calls[batchUrl];
       segment = Segment.getClient(key, { timeout: 9999999 });
 
       segment.identify(userId);
@@ -663,12 +666,11 @@ describe('Segment', function() {
 
     it('should force batch request', function() {
       segment.track('whatever');
-      calls = fetchMock._calls[batchUrl];
-      expect(calls).toEqual(undefined);
+      expect(getCalls()).toEqual(undefined);
 
       segment.force();
       calls = fetchMock._calls[batchUrl];
-      expect(calls.length).toEqual(1);
+      expect(getCalls().length).toEqual(1);
     });
   });
 });
@@ -692,11 +694,11 @@ describe('test mock', function() {
       });
     }
 
+    checkMethod('identify');
     checkMethod('track');
     checkMethod('anonymousTrack');
     checkMethod('page');
     checkMethod('anonymousPage');
-    checkMethod('identify');
     checkMethod('force');
   });
 
