@@ -684,6 +684,22 @@ describe('test mock', function() {
     segment.inspect.clearEvents();
   });
 
+
+  describe('regular methods', function() {
+    function checkMethod(name) {
+      it ('has ' + name + ' method', function() {
+        expect(typeof segment[name]).toEqual('function');
+      });
+    }
+
+    checkMethod('track');
+    checkMethod('anonymousTrack');
+    checkMethod('page');
+    checkMethod('anonymousPage');
+    checkMethod('identify');
+    checkMethod('force');
+  });
+
   describe('#inspect', function() {
     if ('should be object', function() {
       expect(typeof segment.inspect).toEqual('object');
